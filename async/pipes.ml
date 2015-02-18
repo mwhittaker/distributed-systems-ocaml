@@ -38,12 +38,29 @@ let pipe_iter () : unit Deferred.t =
   Pipe.close w;
   Pipe.iter r ~f:(fun i -> return (printf "read %d\n" i))
 
+let pipe_transfer () : unit Deferred.t =
+  let (r, w) = Pipe.create () in
+  let (r', w') = Pipe.create () in
+  don't_wait_for (Pipe.write w 42);
+  don't_wait_for (Pipe.transfer r w' ~f:(succ));
+  Pipe.read r' >>| function
+  | `Eof  -> failwith "impossible"
+  | `Ok a -> printf "a = %d\n" a
+
+let pipe_interleave () : unit Deferred.t =
+  let (rs, ws) = List.(unzip (map (range 0 10) ~f:(fun _ -> Pipe.create ()))) in
+  List.iteri ws ~f:(fun i w -> don't_wait_for (Pipe.write w i >>| fun () -> Pipe.close w));
+  let r = Pipe.interleave rs in
+  Pipe.iter r ~f:(fun i -> return (printf "read %d\n" i))
+
 let main () : unit Deferred.t =
   write_then_read () >>= fun () ->
   write_and_read () >>= fun () ->
   write_without_pushback_then_read () >>= fun () ->
   pipe_fold () >>= fun () ->
   pipe_iter () >>= fun () ->
+  pipe_transfer () >>= fun () ->
+  pipe_interleave () >>= fun () ->
   return ()
 
 let () =
