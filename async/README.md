@@ -2,8 +2,10 @@
 - [helloRight.ml](helloRight.ml)
 - [helloCommand.ml](helloCommand.ml)
 - [basics.ml](basics.ml)
-- TODO: choice
+- [choices.ml](choices.ml)
 - [pipes.ml](pipes.ml)
+- [ivars.ml](ivars.ml)
+- morechoices
 - [morePipes.ml](morePipes.ml)
 - TODO: map reduce simple
 - TODO: map reduce complex
