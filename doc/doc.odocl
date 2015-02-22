@@ -8,3 +8,6 @@ Ivars
 MoreChoices
 MorePipes
 MapReduceSimple
+StdinLine
+StdinAll
+Cat
