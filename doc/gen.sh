@@ -1,4 +1,4 @@
-dirs="async readwrite"
+dirs="async readwrite tcp"
 
 for d in $dirs; do
     cat ../$d/doc.odocl

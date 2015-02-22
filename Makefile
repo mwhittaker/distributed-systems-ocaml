@@ -3,7 +3,7 @@ BYTES    = $(SRCS:.ml=.byte)
 PKGS     = async
 CFLAGS   = -warn-error,A
 DOCFLAGS = -keep-code #,-intro,/home/vagrant/distributed-systems/doc/index.txt
-SRCDIRS  = doc,async,readwrite
+SRCDIRS  = doc,async,readwrite,tcp
 
 all: $(BYTES)
 

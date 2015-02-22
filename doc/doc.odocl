@@ -11,3 +11,7 @@ MapReduceSimple
 StdinLine
 StdinAll
 Cat
+PrintServer
+EchoOnceServer
+EchoServer
+ExitEchoServer
