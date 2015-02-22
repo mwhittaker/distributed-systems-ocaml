@@ -15,19 +15,9 @@ let pipe_interleave () : unit Deferred.t =
   let r = interleave rs in
   Pipe.iter r ~f:(fun i -> return (printf "read %d\n" i))
 
-let rec iter_and_close
-    (r: 'a Pipe.Reader.t)
-    ~(f: 'a -> unit Deferred.t)
-    ~(onclose: unit -> unit Deferred.t)
-    : unit Deferred.t =
-  Pipe.read r >>= function
-  | `Eof  -> onclose ()
-  | `Ok x -> f x >>= fun () -> iter_and_close r ~f ~onclose
-
 let broadcast (r: 'a Pipe.Reader.t) (ws: 'a Pipe.Writer.t list) : unit Deferred.t =
-  iter_and_close r
-    ~f:(fun x -> Deferred.all_unit (List.map ws ~f:(fun w -> Pipe.write w x)))
-    ~onclose:(fun () -> return (List.iter ws ~f:Pipe.close))
+  Pipe.iter r ~f:(fun x -> Deferred.all_unit (List.map ws ~f:(fun w -> Pipe.write w x)))
+  >>| fun () -> List.iter ws ~f:Pipe.close
 
 let pipe_broadcast () : unit Deferred.t =
   let (r, w) = Pipe.create () in
