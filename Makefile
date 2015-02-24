@@ -1,9 +1,9 @@
 SRCS     = $(wildcard *.ml)
 BYTES    = $(SRCS:.ml=.byte)
-PKGS     = async
+PKGS     = async,cohttp.async,uri
 CFLAGS   = -warn-error,A
 DOCFLAGS = -keep-code,-intro,$$PWD/doc/index.txt
-SRCDIRS  = doc,async,readwrite,tcp
+SRCDIRS  = doc,async,readwrite,tcp,http
 
 all: $(BYTES)
 

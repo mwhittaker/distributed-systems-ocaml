@@ -1,2 +1,2 @@
-PKG core async
+PKG core async cohttp uri
 B _build

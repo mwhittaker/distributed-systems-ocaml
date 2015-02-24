@@ -41,3 +41,12 @@ TCP
  {- {{:code_ExitEchoServer.html} [ExitEchoServer]}}
 }
 
+{9 http}
+
+
+{ol
+ {- {{:code_HelloServer.html} [HelloServer]}}
+ {- {{:code_HelloGetServer.html} [HelloGetServer]}}
+ {- {{:code_HelloHtmlServer.html} [HelloHtmlServer]}}
+}
+
