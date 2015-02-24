@@ -10,6 +10,10 @@ MorePipes
 MapReduceSimple
 StdinLine
 StdinAll
+WriteString
+WriteLine
+WriteWith
+Diary
 Cat
 PrintServer
 EchoOnceServer

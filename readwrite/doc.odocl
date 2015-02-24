@@ -1,3 +1,7 @@
 StdinLine
 StdinAll
+WriteString
+WriteLine
+WriteWith
+Diary
 Cat
