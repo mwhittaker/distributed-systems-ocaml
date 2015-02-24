@@ -1,28 +1,43 @@
-{9 Async}
+
+{9 async}
+
+Async
+
 {ol
-{- {{:code_HelloWrong.html} [HelloWrong]}}
-{- {{:code_HelloRight.html} [HelloRight]}}
-{- {{:code_HelloCommand.html} [HelloCommand]}}
-{- {{:code_Basics.html} [Basics]}}
-{- {{:code_Choices.html} [Choices]}}
-{- {{:code_Pipes.html} [Pipes]}}
-{- {{:code_Ivars.html} [Ivars]}}
-{- {{:code_MoreChoices.html} [MoreChoices]}}
-{- {{:code_MorePipes.html} [MorePipes]}}
-{- {{:code_MapReduceSimple.html} [MapReduceSimple]}}
+ {- {{:code_HelloWrong.html} [HelloWrong]}}
+ {- {{:code_HelloRight.html} [HelloRight]}}
+ {- {{:code_HelloCommand.html} [HelloCommand]}}
+ {- {{:code_Basics.html} [Basics]}}
+ {- {{:code_Choices.html} [Choices]}}
+ {- {{:code_Pipes.html} [Pipes]}}
+ {- {{:code_Ivars.html} [Ivars]}}
+ {- {{:code_MoreChoices.html} [MoreChoices]}}
+ {- {{:code_MorePipes.html} [MorePipes]}}
+ {- {{:code_MapReduceSimple.html} [MapReduceSimple]}}
 }
 
-{9 Read/Write}
+{9 readwrite}
+
+Read/Write
+
 {ol
-{- {{:code_StdinLine.html} [StdinLine]}}
-{- {{:code_StdinAll.html} [StdinAll]}}
-{- {{:code_Cat.html} [Cat]}}
+ {- {{:code_StdinLine.html} [StdinLine]}}
+ {- {{:code_StdinAll.html} [StdinAll]}}
+ {- {{:code_WriteString.html} [WriteString]}}
+ {- {{:code_WriteLine.html} [WriteLine]}}
+ {- {{:code_WriteWith.html} [WriteWith]}}
+ {- {{:code_Diary.html} [Diary]}}
+ {- {{:code_Cat.html} [Cat]}}
 }
 
-{9 TCP}
+{9 tcp}
+
+TCP
+
 {ol
-{- {{:code_PrintServer.html} [PrintServer]}}
-{- {{:code_EchoOnceServer.html} [EchoOnceServer]}}
-{- {{:code_EchoServer.html} [EchoServer]}}
-{- {{:code_ExitEchoServer.html} [ExitEchoServer]}}
+ {- {{:code_PrintServer.html} [PrintServer]}}
+ {- {{:code_EchoOnceServer.html} [EchoOnceServer]}}
+ {- {{:code_EchoServer.html} [EchoServer]}}
+ {- {{:code_ExitEchoServer.html} [ExitEchoServer]}}
 }
+

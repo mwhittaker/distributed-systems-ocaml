@@ -12,7 +12,7 @@ all: $(BYTES)
 
 .PHONY: doc
 doc:
-	cd doc && ./gen.sh
+	cd doc && make && ./gen.byte
 	corebuild -pkgs $(PKGS) -docflags $(DOCFLAGS) -Is $(SRCDIRS) doc/doc.docdir/index.html
 	cp doc/style.css doc.docdir
 
