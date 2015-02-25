@@ -1,7 +1,7 @@
 open Core.Std
 open Async.Std
 
-(* dirs with a [doc.odocl] file. *)
+(* Directories with a [doc.odocl] file. *)
 let dirs = [
   "async";
   "readwrite";
@@ -9,45 +9,101 @@ let dirs = [
   "http";
 ]
 
-(* intro file *)
-let intro = "intro.txt"
+(* Paths to the [doc.odocl] files. *)
+let odocls = List.map dirs ~f:(sprintf "../%s/doc.odocl")
 
-(* output file *)
-let index = "index.txt"
+(* Template file *)
+let template = "template.txt"
 
-let write_odocl (index: Writer.t) (dir: string) : unit Deferred.t =
-  (* print header *)
-  Writer.writef index "{9 %s}\n" dir;
+let cat (strings: string list) : string =
+  String.concat ~sep:"\n" strings
 
-  (* print chapter *)
-  Reader.file_contents ("../" ^ dir ^ "/chapter.txt") >>= fun chapter_txt ->
-  Writer.write_line index "";
-  Writer.write index chapter_txt;
-  Writer.write_line index "";
+(* [parse_odocl odocl] parses [odocl], a [doc.odocl] file into an ocamldoc
+ * formatted list. For example, if [odocl] were the following:
+ *
+ *     HelloWorld
+ *     GoodBye
+ *     Foo
+ *
+ * then, [parse_odocl odocl] would return the following:
+ *
+ *     {ol
+ *       {- {{:code_HelloWorld.html} [HelloWorld]}}
+ *       {- {{:code_GoodBye.html} [GoodBye]}}
+ *       {- {{:code_Foo.html} [Foo]}}
+ *     }
+ *)
+let parse_odocl (odocl: string) : string Deferred.t =
+  let format_line line =
+    sprintf "  {- {{:code_%s.html} [%s]}}" line line
+  in
 
-  (* begin list *)
-  Writer.writef index "{ol\n";
+  Reader.with_file odocl ~f:(fun r ->
+    Reader.lines r
+    |> Pipe.map ~f:format_line
+    |> Pipe.to_list >>| fun lines ->
+    sprintf "{ol\n%s\n}" (cat lines)
+  )
 
-  Reader.open_file ("../" ^ dir ^ "/doc.odocl") >>= fun r ->
-  let lines = Reader.lines r in
-  let write_line s = Writer.writef index " {- {{:code_%s.html} [%s]}}\n" s s in
-  Pipe.iter_without_pushback lines ~f:write_line >>= fun () ->
+(* [write_index] creates an [index.txt] file from a template file. The template
+ * file is an ocamldoc formatted file with extra "%s" strings throughout. If
+ * there are [n] "%s" strings [s_1], ..., [s_n], they are replaced with the
+ * parsed contents of the first [n] entries in [odocls]. For example, if we
+ * have the following template:
+ *
+ *     Hello!
+ *     %s
+ *     Bye!
+ *     %s
+ *
+ * and [odocls = ["foo"; "bar"]] and the [foo] directory contains the following
+ * [odocl]:
+ *
+ *     Foo
+ *
+ * and [bar] contains the following [odocl]:
+ *
+ *     Bar
+ *
+ * then [write_index w] writes the following to [w]:
+ *
+ *     Hello!
+ *     {ol
+ *       {- {{:code_Foo.html} [Foo]}}
+ *     }
+ *     Bye!
+ *     {ol
+ *       {- {{:code_Bar.html} [Bar]}}
+ *     }
+ *)
+let write_index (w: Writer.t) : unit Deferred.t =
+  Reader.with_file template ~f:(fun r ->
+    Deferred.List.map odocls ~f:parse_odocl >>= fun odocls ->
+    Pipe.fold (Reader.lines r) ~init:([], odocls)
+      ~f:(fun (lines, odocls) line ->
+            match line, odocls with
+            | "%s", []        -> return (lines, odocls)
+            | "%s", o::odocls -> return (o::lines, odocls)
+            | l,    _         -> return (l::lines, odocls)
+      ) >>| fun (lines, _) ->
+    Writer.write w (cat (List.rev lines))
+  )
 
-  (* end list *)
-  Writer.write index "}\n\n";
-
-  return ()
-
-let write_index (index: Writer.t) : unit Deferred.t =
-  Reader.file_contents intro >>= fun intro_txt ->
-  Writer.write index intro_txt;
-  Writer.write_line index "";
-  Deferred.List.iter dirs ~f:(write_odocl index)
+(* [write_odocl w] concatenates the contents of [odocls] and writes it [w] *)
+let write_odocl (w: Writer.t) : unit Deferred.t =
+  Deferred.List.map odocls ~f:Reader.file_contents >>| fun modules ->
+  Writer.write w (String.concat ~sep:"" modules)
 
 let main () : unit Deferred.t =
-  try_with (fun () -> Writer.with_file index ~f:write_index) >>| function
-  | Ok ()   -> ()
-  | Error e -> print_endline (Exn.to_string e)
+  Writer.with_file "index.txt" ~f:write_index >>= fun () ->
+  Writer.with_file "doc.odocl" ~f:write_odocl >>= fun () ->
+  return ()
 
 let () =
-  Command.(run (async ~summary:"" Spec.empty main))
+  Command.async
+    ~summary:"Generate ocamldocs."
+    Command.Spec.empty
+    (fun () -> try_with (fun () -> main ()) >>| function
+      | Ok () -> ()
+      | Error e -> print_endline (Exn.to_string e))
+  |> Command.run

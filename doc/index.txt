@@ -1,52 +1,39 @@
-
-{9 async}
-
-Async
-
+{9 Async}
 {ol
- {- {{:code_HelloWrong.html} [HelloWrong]}}
- {- {{:code_HelloRight.html} [HelloRight]}}
- {- {{:code_HelloCommand.html} [HelloCommand]}}
- {- {{:code_Basics.html} [Basics]}}
- {- {{:code_Choices.html} [Choices]}}
- {- {{:code_Pipes.html} [Pipes]}}
- {- {{:code_Ivars.html} [Ivars]}}
- {- {{:code_MoreChoices.html} [MoreChoices]}}
- {- {{:code_MorePipes.html} [MorePipes]}}
- {- {{:code_MapReduceSimple.html} [MapReduceSimple]}}
+  {- {{:code_HelloWrong.html} [HelloWrong]}}
+  {- {{:code_HelloRight.html} [HelloRight]}}
+  {- {{:code_HelloCommand.html} [HelloCommand]}}
+  {- {{:code_Basics.html} [Basics]}}
+  {- {{:code_Choices.html} [Choices]}}
+  {- {{:code_Pipes.html} [Pipes]}}
+  {- {{:code_Ivars.html} [Ivars]}}
+  {- {{:code_MoreChoices.html} [MoreChoices]}}
+  {- {{:code_MorePipes.html} [MorePipes]}}
+  {- {{:code_MapReduceSimple.html} [MapReduceSimple]}}
 }
 
-{9 readwrite}
-
-Read/Write
-
+{9 Reader/Writer}
 {ol
- {- {{:code_StdinLine.html} [StdinLine]}}
- {- {{:code_StdinAll.html} [StdinAll]}}
- {- {{:code_WriteString.html} [WriteString]}}
- {- {{:code_WriteLine.html} [WriteLine]}}
- {- {{:code_WriteWith.html} [WriteWith]}}
- {- {{:code_Diary.html} [Diary]}}
- {- {{:code_Cat.html} [Cat]}}
+  {- {{:code_StdinLine.html} [StdinLine]}}
+  {- {{:code_StdinAll.html} [StdinAll]}}
+  {- {{:code_WriteString.html} [WriteString]}}
+  {- {{:code_WriteLine.html} [WriteLine]}}
+  {- {{:code_WriteWith.html} [WriteWith]}}
+  {- {{:code_Diary.html} [Diary]}}
+  {- {{:code_Cat.html} [Cat]}}
 }
 
-{9 tcp}
-
-TCP
-
+{9 TCP}
 {ol
- {- {{:code_PrintServer.html} [PrintServer]}}
- {- {{:code_EchoOnceServer.html} [EchoOnceServer]}}
- {- {{:code_EchoServer.html} [EchoServer]}}
- {- {{:code_ExitEchoServer.html} [ExitEchoServer]}}
+  {- {{:code_PrintServer.html} [PrintServer]}}
+  {- {{:code_EchoOnceServer.html} [EchoOnceServer]}}
+  {- {{:code_EchoServer.html} [EchoServer]}}
+  {- {{:code_ExitEchoServer.html} [ExitEchoServer]}}
 }
 
-{9 http}
-
-
+{9 HTTP}
 {ol
- {- {{:code_HelloServer.html} [HelloServer]}}
- {- {{:code_HelloGetServer.html} [HelloGetServer]}}
- {- {{:code_HelloHtmlServer.html} [HelloHtmlServer]}}
+  {- {{:code_HelloServer.html} [HelloServer]}}
+  {- {{:code_HelloGetServer.html} [HelloGetServer]}}
+  {- {{:code_HelloHtmlServer.html} [HelloHtmlServer]}}
 }
-
