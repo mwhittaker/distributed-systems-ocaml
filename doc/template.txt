@@ -14,8 +14,8 @@ the code we write will involve async.
 {b Resources}
 {ul
     {- {{:http://ocaml.janestreet.com/ocaml-core/111.28.00/doc/} Jane Street Documentation}}
-    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/} Jane Street Core Documentation}}
-    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std} Jane Street Async Documentation}}
+    {- {{:http://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/} Jane Street Core Documentation}}
+    {- {{:http://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std} Jane Street Async Documentation}}
     {- {{:https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html} Real World OCaml Chapter 18}}
     {- {{:http://www.cs.cornell.edu/Courses/cs3110/2015sp/schedule.php} Cornell's CS 3110 Lecture 18-21}}
 }
