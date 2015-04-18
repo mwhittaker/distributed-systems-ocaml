@@ -1,5 +1,24 @@
+{2 Distributed Systems}
+
 {9 Async}
+Concurrency and parallelism are at the heart of distributed systems. When
+programs scale to multiple threads, processes, or machines, we have to reason
+about multiple computations that are all happening at the same time. In this
+chapter, we explore Jane Street's monadic cooperative multithreading library:
+Async. Async is a library that makes writing concurrent code fun and easy!
+Async will also serve as a building block throughout the rest of the book; all
+the code we write will involve async.
+
 %s
+
+{b Resources}
+{ul
+    {- {{:http://ocaml.janestreet.com/ocaml-core/111.28.00/doc/} Jane Street Documentation}}
+    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/} Jane Street Core Documentation}}
+    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std} Jane Street Async Documentation}}
+    {- {{:https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html} Real World OCaml Chapter 18}}
+    {- {{:http://www.cs.cornell.edu/Courses/cs3110/2015sp/schedule.php} Cornell's CS 3110 Lecture 18-21}}
+}
 
 {9 Reader/Writer}
 %s
