@@ -2,3 +2,7 @@ PrintServer
 EchoOnceServer
 EchoServer
 ExitEchoServer
+TcpShell
+KeyValueStore
+RedisOp
+Redis

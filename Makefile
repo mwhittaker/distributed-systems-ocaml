@@ -1,19 +1,19 @@
 SRCS     = $(wildcard *.ml)
 BYTES    = $(SRCS:.ml=.byte)
 PKGS     = async,cohttp.async,uri
-CFLAGS   = -warn-error,A
+CFLAGS   = -warn-error,A-39
 DOCFLAGS = -keep-code,-intro,$$PWD/doc/index.txt
 SRCDIRS  = doc,async,readwrite,tcp,http
 
 all: $(BYTES)
 
 %.byte: %.ml
-	corebuild -pkgs $(PKGS) -cflags $(CFLAGS) $@
+	corebuild -use-menhir -pkgs $(PKGS) -cflags $(CFLAGS) $@
 
 .PHONY: doc
 doc:
 	cd doc && make && ./gen.byte
-	corebuild -pkgs $(PKGS) -docflags $(DOCFLAGS) -Is $(SRCDIRS) doc/doc.docdir/index.html
+	corebuild -use-menhir -pkgs $(PKGS) -docflags $(DOCFLAGS) -Is $(SRCDIRS) doc/doc.docdir/index.html
 	cp doc/style.css doc.docdir
 
 .PHONY: clean
