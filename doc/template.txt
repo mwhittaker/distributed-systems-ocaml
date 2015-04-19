@@ -32,6 +32,11 @@ the code we write will involve async.
 {9 TCP}
 %s
 
+{b Resources}
+{ul
+    {- {{:http://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Tcp} TCP API}}
+}
+
 {9 HTTP}
 %s
 
