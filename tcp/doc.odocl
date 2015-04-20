@@ -2,6 +2,8 @@ PrintServer
 EchoOnceServer
 EchoServer
 ExitEchoServer
+PrintClient
+EchoClient
 TcpShell
 KeyValueStore
 RedisOp
