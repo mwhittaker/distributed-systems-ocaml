@@ -40,6 +40,13 @@ the code we write will involve async.
 {9 Messaging}
 %s
 
+
+{b Resources}
+{ul
+    {- {{:https://realworldocaml.org/v1/en/html/data-serialization-with-s-expressions.html} Real World OCaml S-Expressions}}
+    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Rpc} RPC API}}
+}
+
 {9 HTTP}
 %s
 
