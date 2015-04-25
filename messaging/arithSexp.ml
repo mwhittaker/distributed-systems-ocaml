@@ -8,6 +8,7 @@ module Request = struct
     | Sub   of int * int
     | Times of int * int
     | Eq    of int * int
+  with sexp
 
   let to_string r =
     match r with
@@ -23,6 +24,7 @@ module Response = struct
   type t =
     | Bool of bool
     | Int  of int
+  with sexp
 
   let to_string r =
     match r with
