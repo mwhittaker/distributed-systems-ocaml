@@ -47,6 +47,9 @@ the code we write will involve async.
     {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Rpc} RPC API}}
 }
 
+{9 Persistence}
+%s
+
 {9 HTTP}
 %s
 

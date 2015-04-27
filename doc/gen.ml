@@ -7,6 +7,7 @@ let dirs = [
   "readwrite";
   "tcp";
   "messaging";
+  "persistence";
   "http";
 ]
 

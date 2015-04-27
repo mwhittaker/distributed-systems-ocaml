@@ -3,7 +3,7 @@ BYTES    = $(SRCS:.ml=.byte)
 PKGS     = async,cohttp.async,uri
 CFLAGS   = -warn-error,A-39
 DOCFLAGS = -keep-code,-intro,$$PWD/doc/index.txt
-SRCDIRS  = doc,async,readwrite,tcp,messaging,http
+SRCDIRS  = doc,async,readwrite,tcp,messaging,persistence,http
 
 all: $(BYTES)
 
