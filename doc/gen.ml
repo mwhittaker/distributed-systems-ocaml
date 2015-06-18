@@ -6,6 +6,7 @@ let dirs = [
   "async";
   "readwrite";
   "tcp";
+  "serialization";
   "messaging";
   "persistence";
   "http";

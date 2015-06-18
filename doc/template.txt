@@ -37,6 +37,10 @@ the code we write will involve async.
     {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Tcp} TCP API}}
 }
 
+{9 Serialization}
+%s
+
+
 {9 Messaging}
 %s
 
