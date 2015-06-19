@@ -41,6 +41,13 @@ the code we write will involve async.
 %s
 
 
+{b Resources}
+{ul
+    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/#Std.Sexp} Sexp API}}
+    {- {{:http://caml.inria.fr/pub/docs/manual-ocaml/libref/Marshal.html} Marshal API}}
+    {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/#Std.Binable} Binable API}}
+}
+
 {9 Messaging}
 %s
 
