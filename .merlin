@@ -1,2 +1,2 @@
-PKG core async cohttp uri
+PKG core async cohttp uri leveldb
 B _build
