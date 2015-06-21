@@ -23,9 +23,16 @@ let serve _ r w =
 
   loop r w
 
-let main () : unit Deferred.t =
-  ignore (Tcp.(Server.create (Tcp.on_port 8080) serve));
+let main port () : unit Deferred.t =
+  ignore (Tcp.(Server.create (Tcp.on_port port) serve));
   never ()
 
 let () =
-  Command.(run (async ~summary:"" Spec.empty main))
+  Command.async
+    ~summary:"Arith RPC"
+    Command.Spec.(
+      empty
+      +> flag "-port" (required int) ~doc:"RPC server port"
+    )
+    main
+  |> Command.run
