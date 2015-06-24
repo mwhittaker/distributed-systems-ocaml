@@ -1,26 +1,45 @@
 (* Now that we've written a hello world program, let's dive into some more
- * meaty async code. Hopefully, most of this should be familiar to you after reading
- * Chapter 18 of Real World OCaml. *)
+ * meaty async code. Hopefully, most of this should be familiar to you after
+ * reading Chapter 18 of Real World OCaml. *)
 open Core.Std
 open Async.Std
 
 (* First up, let's play with deferreds and bind. An 'a Deferred.t (or
  * colloquially, an 'a deferred) represents a value of type 'a that may or may
  * not yet be determined. For example, consider calling a function
- * read_line_from_stdin that reads a line from the user and returns a string
- * deferred. When you call read_line_from_stdin and get a string deferred, the
- * deferred may or may not yet be determined. If the user hasn't typed in
- * anything yet, then the string deferred hasn't yet been determined. Once the
- * user types something in, the string becomes determined.
+ * read_line_from_stdin that reads a line from the user and returns the line as
+ * a string deferred. Now imagine you call read_line_from_stdin and get some
+ * string deferred s. s may or may not yet be determined. If the user hasn't
+ * typed in anything yet, then s  hasn't yet been determined. Once the user
+ * types something in, s becomes determined with whatever the user typed.
  *
- * So how do we program with deferreds if they may not even be determined when
- * we get them? The answer is bind. bind takes in an 'a deferred and a function
- * f from 'a deferred to 'b deferred and returns a 'b deferred. bind will wait
- * for the 'a deferred to become determined, then unwrap the 'a and pass it to
- * f to get a 'b deferred.
+ * I like to think of deferreds as cardboard boxes that may or may not contain
+ * a value. When a deferred isn't yet determined, I think of it as an empty
+ * box. When a deferred is determined, I imagine the box is full with some
+ * value.
  *
- * We can also chain together a sequence of binds, like with the code below.
- * This function calls bind with two arguments. The first is (return 1), which
+ * So if you give me a deferred, and it's not yet determined, what do I do with
+ * it? Well, if the cardboard box is full, we could open it up, pull out the
+ * value and do whatever we want with it. But if the cardboard box is empty,
+ * we're in a bit of a pickle. We could sit and wait around twiddling our
+ * thumbs until the box is full and then unpack it, but that wouldn't be
+ * asynchronous at all (which, for a library named async, would be pretty
+ * unfortunate).
+ *
+ * Enter bind.
+ *
+ * Bind is a higher order function that is fundamental to programming with
+ * deferreds. Here's the type of bind:
+ *
+ *   'a Deferred.t -> ('a -> 'b Deferred.t) -> b' Deferred.t
+ *
+ * Let's call the first argument x and the second f. Bind registers f to be
+ * called on the value of x once it becomes determined. In other words, bind
+ * will wait until our cardboard boxes are full before passing their contents
+ * to a provided function. We can chain together a sequence of binds to create
+ * complex computations, as shown in the code below. *)
+
+(* This function calls bind with two arguments. The first is (return 1), which
  * is an int deferred. The second is the very big function (fun x -> ... return
  * ()))), which is a function from int deferred to unit deferred. When (return
  * 1) becomes determined, the 1 is unwrapped and the very big function is
