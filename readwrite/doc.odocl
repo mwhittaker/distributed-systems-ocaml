@@ -1,4 +1,5 @@
 StdinLine
+StdoutLine
 StdinAll
 WriteString
 WriteLine

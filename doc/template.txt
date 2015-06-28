@@ -27,6 +27,14 @@ Chapter 18 of Real World Ocaml}!
 }
 
 {9 Reader/Writer}
+Whether it be files or TCP connections, programs often interact with the world
+by reading and writing data to and from an external source. In this chapter,
+we'll examine Async's Reader and Writer interfaces. These interfaces provide a
+uniform way to read and write from all sorts of external sources. After this
+chapter, you'll be able to read strings from stdin, and you'll be a master a
+file IO. Readers and Writers will also crop up again when we cover TCP, so
+you'll be prepared for that too.
+
 %s
 
 {b Resources}
