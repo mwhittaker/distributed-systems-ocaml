@@ -1,6 +1,21 @@
 {2 Distributed Systems}
 
-{9 Async}
+{8 Section I: The Basics}
+In this section, we'll learn the basic programming constructs and libraries we
+need to write distributed systems in OCaml. After this section, we'll know how
+to
+{ul
+    {- do multiple things at the same time with Async }
+    {- read and write data to and from the outside world with the Reader and
+       Writer module }
+    {- send simple messages between processes using TCP }
+    {- convert OCaml values into bytes and back using various forms of
+    serialization }
+    {- send more complex messages between processes using TCP and RPC }
+    {- Persist information to stable storage }
+}
+
+{9 Chapter 1: Async}
 Concurrency and parallelism are at the heart of distributed systems. When
 programs scale to multiple threads, processes, or machines, we have to reason
 about multiple computations that are all happening at the same time. In this
@@ -26,7 +41,7 @@ Chapter 18 of Real World Ocaml}!
     {- {{:https://www.cs.cornell.edu/Courses/cs3110/2015sp/schedule.php} Cornell's CS 3110 Lecture 18-21}}
 }
 
-{9 Reader/Writer}
+{9 Chapter 2: Reader/Writer}
 Whether it be files or TCP connections, programs often interact with the world
 by reading and writing data to and from an external source. In this chapter,
 we'll examine Async's Reader and Writer interfaces. These interfaces provide a
@@ -43,7 +58,7 @@ you'll be prepared for that too.
     {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Writer} Writer API}}
 }
 
-{9 TCP}
+{9 Chapter 3: TCP}
 %s
 
 {b Resources}
@@ -51,7 +66,7 @@ you'll be prepared for that too.
     {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Tcp} TCP API}}
 }
 
-{9 Serialization}
+{9 Chapter 4: Serialization}
 %s
 
 
@@ -62,7 +77,7 @@ you'll be prepared for that too.
     {- {{:https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/#Std.Binable} Binable API}}
 }
 
-{9 Messaging}
+{9 Chapter 5: Messaging}
 %s
 
 
@@ -73,8 +88,12 @@ you'll be prepared for that too.
     {- {{:https://bitbucket.org/yminsky/core-hello-world} Yaron Minsky's Core Hello World}}
 }
 
-{9 Persistence}
+{9 Chapter 6: Persistence}
 %s
+
+{8 Appendix }
+The appendix contains miscellaneous programs and snippets on topics that may be
+useful, but not necessary, to writing distributed systems.
 
 {9 HTTP}
 %s
