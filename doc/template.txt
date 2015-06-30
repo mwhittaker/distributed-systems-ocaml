@@ -59,6 +59,12 @@ you'll be prepared for that too.
 }
 
 {9 Chapter 3: TCP}
+Distributed systems involve multiple processes running on different computers,
+different data centers, or even different continents. Despite the geographic
+separation, the processes can cooperate and function by communicating with one
+another with networking protocols like UDP and TCP. In this chapter, we'll
+explore TCP network programming in OCaml.
+
 %s
 
 {b Resources}

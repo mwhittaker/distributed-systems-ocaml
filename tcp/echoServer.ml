@@ -1,3 +1,5 @@
+(* In this program, we write a server which receives data from clients and
+ * echoes it back to them. *)
 open Core.Std
 open Async.Std
 
