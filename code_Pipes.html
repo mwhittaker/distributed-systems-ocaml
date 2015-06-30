@@ -1,0 +1,155 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>Pipes</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;In&nbsp;this&nbsp;program,&nbsp;we'll&nbsp;explore&nbsp;another&nbsp;core&nbsp;aysnc&nbsp;data&nbsp;structure:&nbsp;the&nbsp;pipe.<br>
+&nbsp;*&nbsp;Pipes&nbsp;are&nbsp;essentially&nbsp;asynchronous&nbsp;queues.&nbsp;You&nbsp;can&nbsp;write&nbsp;to&nbsp;one&nbsp;end&nbsp;of&nbsp;the<br>
+&nbsp;*&nbsp;pipe&nbsp;and&nbsp;read&nbsp;from&nbsp;the&nbsp;other&nbsp;end&nbsp;of&nbsp;the&nbsp;pipe.&nbsp;Pipes&nbsp;are&nbsp;great&nbsp;for&nbsp;performing<br>
+&nbsp;*&nbsp;message&nbsp;passing&nbsp;concurrency&nbsp;and&nbsp;are&nbsp;very&nbsp;similar&nbsp;to&nbsp;channels&nbsp;from&nbsp;the<br>
+&nbsp;*&nbsp;programming&nbsp;languages&nbsp;like&nbsp;go&nbsp;and&nbsp;rust.&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;The&nbsp;pipe&nbsp;interface&nbsp;is&nbsp;very&nbsp;simple.&nbsp;First,&nbsp;we&nbsp;create&nbsp;a&nbsp;pipe&nbsp;with&nbsp;Pipe.create.<br>
+&nbsp;*&nbsp;This&nbsp;returns&nbsp;the&nbsp;reader&nbsp;and&nbsp;writer&nbsp;ends&nbsp;of&nbsp;the&nbsp;pipe.&nbsp;Then,&nbsp;we&nbsp;can&nbsp;write&nbsp;to<br>
+&nbsp;*&nbsp;the&nbsp;writer&nbsp;end&nbsp;of&nbsp;the&nbsp;pipe&nbsp;with&nbsp;Pipe.write&nbsp;and&nbsp;read&nbsp;from&nbsp;the&nbsp;reader&nbsp;end&nbsp;of<br>
+&nbsp;*&nbsp;the&nbsp;pipe&nbsp;with&nbsp;Pipe.read.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Try&nbsp;uncommenting&nbsp;the&nbsp;following&nbsp;code&nbsp;and&nbsp;run&nbsp;this&nbsp;program.&nbsp;You'll&nbsp;find&nbsp;the<br>
+&nbsp;*&nbsp;code&nbsp;never&nbsp;terminates!&nbsp;Turns&nbsp;out&nbsp;Pipe.write&nbsp;returns&nbsp;a&nbsp;deferred&nbsp;that&nbsp;isn't<br>
+&nbsp;*&nbsp;determined&nbsp;until&nbsp;the&nbsp;pipe&nbsp;is&nbsp;ready&nbsp;to&nbsp;be&nbsp;written&nbsp;to&nbsp;again&nbsp;or&nbsp;until&nbsp;the&nbsp;pipe<br>
+&nbsp;*&nbsp;is&nbsp;closed.&nbsp;Since,&nbsp;we've&nbsp;sequenced&nbsp;our&nbsp;read&nbsp;after&nbsp;our&nbsp;write,&nbsp;this&nbsp;code&nbsp;hangs<br>
+&nbsp;*&nbsp;forever.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;write_then_read&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="comment">(*<br>
+&nbsp;&nbsp;let&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;Pipe.create&nbsp;()&nbsp;in<br>
+&nbsp;&nbsp;Pipe.write&nbsp;w&nbsp;42&nbsp;&gt;&gt;=&nbsp;fun&nbsp;()&nbsp;-&gt;<br>
+&nbsp;&nbsp;Pipe.read&nbsp;r&nbsp;&gt;&gt;=&nbsp;function<br>
+&nbsp;&nbsp;|&nbsp;`Eof&nbsp;&nbsp;-&gt;&nbsp;failwith&nbsp;"impossible"<br>
+&nbsp;&nbsp;|&nbsp;`Ok&nbsp;x&nbsp;-&gt;&nbsp;printf&nbsp;"x&nbsp;=&nbsp;%d\n"&nbsp;x;<br>
+&nbsp;&nbsp;*)</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="comment">(*&nbsp;To&nbsp;fix&nbsp;this&nbsp;problem,&nbsp;we&nbsp;simply&nbsp;don't&nbsp;sequence&nbsp;our&nbsp;read&nbsp;to&nbsp;happen&nbsp;strictly<br>
+&nbsp;*&nbsp;after&nbsp;our&nbsp;write.&nbsp;We&nbsp;can&nbsp;do&nbsp;so&nbsp;by&nbsp;not&nbsp;waiting&nbsp;for&nbsp;the&nbsp;write&nbsp;using&nbsp;the<br>
+&nbsp;*&nbsp;don't_wait_for&nbsp;function.&nbsp;Now&nbsp;when&nbsp;we&nbsp;run&nbsp;this&nbsp;code,&nbsp;it'll&nbsp;print&nbsp;"y&nbsp;=&nbsp;42".&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;write_and_read&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;42);<br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.read&nbsp;r&nbsp;&gt;&gt;|&nbsp;<span class="keyword">function</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Eof</span>&nbsp;&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;failwith&nbsp;<span class="string">"impossible"</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Ok</span>&nbsp;y&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"y&nbsp;=&nbsp;%d\n"</span>&nbsp;y<br>
+<br>
+<span class="comment">(*&nbsp;Alternatively,&nbsp;we&nbsp;can&nbsp;replace&nbsp;`don't_wait_for&nbsp;(Pipe.write&nbsp;w&nbsp;42)`&nbsp;with<br>
+&nbsp;*&nbsp;`Pipe.write_without_pushback&nbsp;w&nbsp;42`*)</span><br>
+<span class="keyword">let</span>&nbsp;write_without_pushback_then_read&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.write_without_pushback&nbsp;w&nbsp;42;<br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.read&nbsp;r&nbsp;&gt;&gt;|&nbsp;<span class="keyword">function</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Eof</span>&nbsp;&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;failwith&nbsp;<span class="string">"impossible"</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Ok</span>&nbsp;z&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"z&nbsp;=&nbsp;%d\n"</span>&nbsp;z<br>
+<br>
+<span class="comment">(*&nbsp;Pipes,&nbsp;like&nbsp;lists,&nbsp;can&nbsp;also&nbsp;be&nbsp;folded&nbsp;across.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_fold&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r&nbsp;=&nbsp;<span class="constructor">Pipe</span>.of_list&nbsp;(<span class="constructor">List</span>.range&nbsp;0&nbsp;10)&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.fold&nbsp;r&nbsp;~init:0&nbsp;~f:(<span class="keyword">fun</span>&nbsp;a&nbsp;i&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(a&nbsp;+&nbsp;i))&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;sum&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"sum&nbsp;is&nbsp;%d\n"</span>&nbsp;sum<br>
+<br>
+<span class="comment">(*&nbsp;Or,&nbsp;itered&nbsp;across.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_iter&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r&nbsp;=&nbsp;<span class="constructor">Pipe</span>.of_list&nbsp;(<span class="constructor">List</span>.range&nbsp;0&nbsp;10)&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(printf&nbsp;<span class="string">"read&nbsp;%d\n"</span>&nbsp;i))<br>
+<br>
+<span class="comment">(*&nbsp;We&nbsp;can&nbsp;also&nbsp;connect&nbsp;the&nbsp;reader&nbsp;end&nbsp;of&nbsp;one&nbsp;pipe&nbsp;into&nbsp;the&nbsp;writer&nbsp;end&nbsp;of<br>
+&nbsp;*&nbsp;another&nbsp;pipe&nbsp;using&nbsp;Pipe.transfer.&nbsp;Here,&nbsp;we&nbsp;create&nbsp;two&nbsp;reader/writer&nbsp;pairs<br>
+&nbsp;*&nbsp;(r,&nbsp;w)&nbsp;and&nbsp;(r',&nbsp;w').&nbsp;We&nbsp;hook&nbsp;up&nbsp;the&nbsp;first&nbsp;pipe&nbsp;into&nbsp;the&nbsp;second&nbsp;and&nbsp;increment<br>
+&nbsp;*&nbsp;the&nbsp;values&nbsp;flowing&nbsp;from&nbsp;the&nbsp;first&nbsp;into&nbsp;the&nbsp;second.&nbsp;We&nbsp;then&nbsp;write&nbsp;42&nbsp;into&nbsp;the<br>
+&nbsp;*&nbsp;first&nbsp;pipe&nbsp;and&nbsp;read&nbsp;it&nbsp;out&nbsp;of&nbsp;the&nbsp;second.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_transfer&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r',&nbsp;w')&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;42);<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.transfer&nbsp;r&nbsp;w'&nbsp;~f:(succ));<br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.read&nbsp;r'&nbsp;&gt;&gt;|&nbsp;<span class="keyword">function</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Eof</span>&nbsp;&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;failwith&nbsp;<span class="string">"impossible"</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Ok</span>&nbsp;a&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"a&nbsp;=&nbsp;%d\n"</span>&nbsp;a<br>
+<br>
+<span class="comment">(*&nbsp;While&nbsp;we&nbsp;use&nbsp;Pipe.transfer&nbsp;to&nbsp;funnel&nbsp;one&nbsp;pipe&nbsp;into&nbsp;another,&nbsp;we&nbsp;can&nbsp;use<br>
+&nbsp;*&nbsp;Pipe.interleave&nbsp;to&nbsp;funnel&nbsp;a&nbsp;whole&nbsp;list&nbsp;of&nbsp;pipes&nbsp;into&nbsp;a&nbsp;single&nbsp;pipe.&nbsp;Here,&nbsp;we<br>
+&nbsp;*&nbsp;create&nbsp;10&nbsp;pipes.&nbsp;We&nbsp;write&nbsp;0&nbsp;into&nbsp;the&nbsp;zeroth&nbsp;pipe,&nbsp;1&nbsp;into&nbsp;the&nbsp;first&nbsp;pipe,<br>
+&nbsp;*&nbsp;etc.&nbsp;Then&nbsp;we&nbsp;interleave&nbsp;the&nbsp;readers&nbsp;of&nbsp;all&nbsp;these&nbsp;pipes&nbsp;into&nbsp;a&nbsp;single&nbsp;reader<br>
+&nbsp;*&nbsp;r.&nbsp;Finally,&nbsp;we&nbsp;iterate&nbsp;over&nbsp;`r`&nbsp;and&nbsp;print&nbsp;out&nbsp;the&nbsp;values&nbsp;we&nbsp;see.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_interleave&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(rs,&nbsp;ws)&nbsp;=&nbsp;<span class="constructor">List</span>.(unzip&nbsp;(map&nbsp;(range&nbsp;0&nbsp;10)&nbsp;~f:(<span class="keyword">fun</span>&nbsp;_&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.create&nbsp;())))&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">List</span>.iteri&nbsp;ws&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;w&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;i&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.close&nbsp;w));<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r&nbsp;=&nbsp;<span class="constructor">Pipe</span>.interleave&nbsp;rs&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(printf&nbsp;<span class="string">"read&nbsp;%d\n"</span>&nbsp;i))<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;write_then_read&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;write_and_read&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;write_without_pushback_then_read&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_fold&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_iter&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_transfer&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_interleave&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

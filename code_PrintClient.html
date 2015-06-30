@@ -1,0 +1,98 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>PrintClient</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;Now&nbsp;that&nbsp;we've&nbsp;familiarized&nbsp;ourselves&nbsp;with&nbsp;writing&nbsp;TCP&nbsp;servers,&nbsp;let's&nbsp;turn<br>
+&nbsp;*&nbsp;our&nbsp;attention&nbsp;to&nbsp;writing&nbsp;TCP&nbsp;clients.&nbsp;Creating&nbsp;a&nbsp;TCP&nbsp;client&nbsp;and&nbsp;creating&nbsp;a<br>
+&nbsp;*&nbsp;TCP&nbsp;server&nbsp;are&nbsp;very&nbsp;similar.&nbsp;Instead&nbsp;of&nbsp;calling&nbsp;Tcp.Server.create,&nbsp;we'll<br>
+&nbsp;*&nbsp;call&nbsp;Tcp.with_connection,&nbsp;but&nbsp;other&nbsp;than&nbsp;that,&nbsp;our&nbsp;code&nbsp;will&nbsp;remain&nbsp;largely<br>
+&nbsp;*&nbsp;unchanged.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;In&nbsp;this&nbsp;program,&nbsp;we'll&nbsp;write&nbsp;a&nbsp;very&nbsp;simple&nbsp;TCP&nbsp;client&nbsp;that&nbsp;sends&nbsp;a&nbsp;single<br>
+&nbsp;*&nbsp;line&nbsp;to&nbsp;a&nbsp;server.&nbsp;This&nbsp;client&nbsp;is&nbsp;intended&nbsp;to&nbsp;be&nbsp;run&nbsp;against&nbsp;our&nbsp;printing<br>
+&nbsp;*&nbsp;server&nbsp;(i.e.&nbsp;printServer.ml).&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;First,&nbsp;we&nbsp;define&nbsp;a&nbsp;function&nbsp;with&nbsp;the&nbsp;same&nbsp;form&nbsp;as&nbsp;the&nbsp;functions&nbsp;we&nbsp;wrote<br>
+&nbsp;*&nbsp;when&nbsp;creating&nbsp;TCP&nbsp;servers.&nbsp;For&nbsp;example,&nbsp;contrast&nbsp;this&nbsp;function&nbsp;to&nbsp;the<br>
+&nbsp;*&nbsp;function&nbsp;we&nbsp;wrote&nbsp;in&nbsp;printServer.ml:<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;let&nbsp;printer&nbsp;_&nbsp;r&nbsp;_&nbsp;=<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Reader.read_line&nbsp;r&nbsp;&gt;&gt;|&nbsp;function<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;`Eof&nbsp;&nbsp;-&gt;&nbsp;print_endline&nbsp;"error"<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;`Ok&nbsp;s&nbsp;-&gt;&nbsp;print_endline&nbsp;s<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;The&nbsp;code&nbsp;has&nbsp;almost&nbsp;identical&nbsp;form.&nbsp;The&nbsp;only&nbsp;difference&nbsp;is&nbsp;that&nbsp;our&nbsp;server<br>
+&nbsp;*&nbsp;reads&nbsp;and&nbsp;our&nbsp;client&nbsp;writes.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;connect&nbsp;_&nbsp;_&nbsp;w&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Writer</span>.write_line&nbsp;w&nbsp;<span class="string">"hello,&nbsp;world!"</span>;<br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="comment">(*&nbsp;Next,&nbsp;we&nbsp;call&nbsp;Tcp.with_connection&nbsp;passing&nbsp;in&nbsp;the&nbsp;address&nbsp;of&nbsp;our&nbsp;server&nbsp;and<br>
+&nbsp;*&nbsp;our&nbsp;handling&nbsp;function:&nbsp;connect.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Tcp</span>.with_connection&nbsp;(<span class="constructor">Tcp</span>.to_host_and_port&nbsp;<span class="string">"localhost"</span>&nbsp;8080)&nbsp;connect<br>
+<br>
+<span class="comment">(*&nbsp;Compile&nbsp;and&nbsp;run&nbsp;printServer.ml.&nbsp;Then,&nbsp;in&nbsp;a&nbsp;separate&nbsp;terminal,&nbsp;compile&nbsp;and<br>
+&nbsp;*&nbsp;run&nbsp;this&nbsp;program.&nbsp;This&nbsp;client&nbsp;will&nbsp;send&nbsp;"hello,&nbsp;world!"&nbsp;to&nbsp;the&nbsp;server&nbsp;and<br>
+&nbsp;*&nbsp;then&nbsp;terminate.&nbsp;The&nbsp;server&nbsp;will&nbsp;print&nbsp;"hello,&nbsp;world!"&nbsp;and&nbsp;then&nbsp;wait&nbsp;for&nbsp;more<br>
+&nbsp;*&nbsp;connections.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

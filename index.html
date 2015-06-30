@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title></title>
+</head>
+<body>
+<h1></h1>
+<h2 id="2_DistributedSystems">Distributed Systems</h2>
+<p>
+
+<div class="h8" id="8_SectionITheBasics">Section I: The Basics</div>
+In this section, we'll learn the basic programming constructs and libraries we
+need to write distributed systems in OCaml. After this section, we'll know how
+to
+<ul>
+<li>do multiple things at the same time with Async </li>
+<li>read and write data to and from the outside world with the Reader and
+       Writer module </li>
+<li>send simple messages between processes using TCP </li>
+<li>convert OCaml values into bytes and back using various forms of
+    serialization </li>
+<li>send more complex messages between processes using TCP and RPC </li>
+<li>Persist information to stable storage </li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter1Async">Chapter 1: Async</div>
+Concurrency and parallelism are at the heart of distributed systems. When
+programs scale to multiple threads, processes, or machines, we have to reason
+about multiple computations that are all happening at the same time. In this
+chapter, we explore Jane Street's monadic cooperative multithreading library:
+Async. Async is a library that makes writing concurrent code fun and easy!
+Async will also serve as a building block throughout the rest of the book; all
+the code we write will involve async. Before we dive into some code, I
+recommend you read
+<a href="https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html">
+Chapter 18 of Real World Ocaml</a>!
+<p>
+
+<OL>
+<li><a href="code_HelloWrong.html"> <code class="code">HelloWrong</code></a></li>
+<li><a href="code_HelloRight.html"> <code class="code">HelloRight</code></a></li>
+<li><a href="code_HelloCommand.html"> <code class="code">HelloCommand</code></a></li>
+<li><a href="code_Basics.html"> <code class="code">Basics</code></a></li>
+<li><a href="code_Choices.html"> <code class="code">Choices</code></a></li>
+<li><a href="code_Pipes.html"> <code class="code">Pipes</code></a></li>
+<li><a href="code_Ivars.html"> <code class="code">Ivars</code></a></li>
+<li><a href="code_MoreChoices.html"> <code class="code">MoreChoices</code></a></li>
+<li><a href="code_MorePipes.html"> <code class="code">MorePipes</code></a></li>
+</OL>
+
+<p>
+
+<b>Resources</b>
+<ul>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/"> Jane Street API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/"> Core API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std"> Async API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Pipe"> Pipe API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Ivar"> Ivar API</a></li>
+<li><a href="https://realworldocaml.org/v1/en/html/concurrent-programming-with-async.html"> Real World OCaml Chapter 18: Async</a></li>
+<li><a href="https://realworldocaml.org/v1/en/html/command-line-parsing.html"> Real World OCaml Chapter 14: Command Line Parsing</a></li>
+<li><a href="https://www.cs.cornell.edu/Courses/cs3110/2015sp/schedule.php"> Cornell's CS 3110 Lecture 18-21</a></li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter2ReaderWriter">Chapter 2: Reader/Writer</div>
+Whether it be files or TCP connections, programs often interact with the world
+by reading and writing data to and from an external source. In this chapter,
+we'll examine Async's Reader and Writer interfaces. These interfaces provide a
+uniform way to read and write from all sorts of external sources. After this
+chapter, you'll be able to read strings from stdin, and you'll be a master a
+file IO. Readers and Writers will also crop up again when we cover TCP, so
+you'll be prepared for that too.
+<p>
+
+<OL>
+<li><a href="code_StdinLine.html"> <code class="code">StdinLine</code></a></li>
+<li><a href="code_StdoutLine.html"> <code class="code">StdoutLine</code></a></li>
+<li><a href="code_StdinAll.html"> <code class="code">StdinAll</code></a></li>
+<li><a href="code_WriteString.html"> <code class="code">WriteString</code></a></li>
+<li><a href="code_WriteLine.html"> <code class="code">WriteLine</code></a></li>
+<li><a href="code_WriteWith.html"> <code class="code">WriteWith</code></a></li>
+<li><a href="code_Diary.html"> <code class="code">Diary</code></a></li>
+<li><a href="code_Cat.html"> <code class="code">Cat</code></a></li>
+</OL>
+
+<p>
+
+<b>Resources</b>
+<ul>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Reader"> Reader API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Writer"> Writer API</a></li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter3TCP">Chapter 3: TCP</div>
+Distributed systems involve multiple processes running on different computers,
+different data centers, or even different continents. Despite the geographic
+separation, the processes can cooperate and function by communicating with one
+another with networking protocols like UDP and TCP. In this chapter, we'll
+explore TCP network programming in OCaml.
+<p>
+
+<OL>
+<li><a href="code_PrintServer.html"> <code class="code">PrintServer</code></a></li>
+<li><a href="code_EchoOnceServer.html"> <code class="code">EchoOnceServer</code></a></li>
+<li><a href="code_EchoServer.html"> <code class="code">EchoServer</code></a></li>
+<li><a href="code_ExitEchoServer.html"> <code class="code">ExitEchoServer</code></a></li>
+<li><a href="code_PrintClient.html"> <code class="code">PrintClient</code></a></li>
+<li><a href="code_EchoClient.html"> <code class="code">EchoClient</code></a></li>
+<li><a href="code_TcpShell.html"> <code class="code">TcpShell</code></a></li>
+<li><a href="code_KeyValueStore.html"> <code class="code">KeyValueStore</code></a></li>
+<li><a href="code_RedisOp.html"> <code class="code">RedisOp</code></a></li>
+<li><a href="code_Redis.html"> <code class="code">Redis</code></a></li>
+</OL>
+
+<p>
+
+<b>Resources</b>
+<ul>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Tcp"> TCP API</a></li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter4Serialization">Chapter 4: Serialization</div>
+<OL>
+<li><a href="code_HandCard.html"> <code class="code">HandCard</code></a></li>
+<li><a href="code_SexpCard.html"> <code class="code">SexpCard</code></a></li>
+<li><a href="code_MarshalCard.html"> <code class="code">MarshalCard</code></a></li>
+<li><a href="code_BinioCard.html"> <code class="code">BinioCard</code></a></li>
+</OL>
+
+<p>
+
+<b>Resources</b>
+<ul>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/#Std.Sexp"> Sexp API</a></li>
+<li><a href="http://caml.inria.fr/pub/docs/manual-ocaml/libref/Marshal.html"> Marshal API</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/core/#Std.Binable"> Binable API</a></li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter5Messaging">Chapter 5: Messaging</div>
+<OL>
+<li><a href="code_ArithMarshal.html"> <code class="code">ArithMarshal</code></a></li>
+<li><a href="code_MarshalClient.html"> <code class="code">MarshalClient</code></a></li>
+<li><a href="code_MarshalServer.html"> <code class="code">MarshalServer</code></a></li>
+<li><a href="code_ArithSexp.html"> <code class="code">ArithSexp</code></a></li>
+<li><a href="code_SexpClient.html"> <code class="code">SexpClient</code></a></li>
+<li><a href="code_SexpServer.html"> <code class="code">SexpServer</code></a></li>
+<li><a href="code_ToStringProtocol.html"> <code class="code">ToStringProtocol</code></a></li>
+<li><a href="code_ToStringClient.html"> <code class="code">ToStringClient</code></a></li>
+<li><a href="code_ToStringServer.html"> <code class="code">ToStringServer</code></a></li>
+<li><a href="code_ArithRpc.html"> <code class="code">ArithRpc</code></a></li>
+<li><a href="code_RpcClient.html"> <code class="code">RpcClient</code></a></li>
+<li><a href="code_RpcServer.html"> <code class="code">RpcServer</code></a></li>
+</OL>
+
+<p>
+
+<b>Resources</b>
+<ul>
+<li><a href="https://realworldocaml.org/v1/en/html/data-serialization-with-s-expressions.html"> Real World OCaml S-Expressions</a></li>
+<li><a href="https://ocaml.janestreet.com/ocaml-core/111.28.00/doc/async/#Std.Rpc"> RPC API</a></li>
+<li><a href="https://bitbucket.org/yminsky/core-hello-world"> Yaron Minsky's Core Hello World</a></li>
+</ul>
+
+<p>
+
+<div class="h9" id="9_Chapter6Persistence">Chapter 6: Persistence</div>
+<OL>
+<li><a href="code_Ephemeral.html"> <code class="code">Ephemeral</code></a></li>
+<li><a href="code_Fsync.html"> <code class="code">Fsync</code></a></li>
+<li><a href="code_LevelDb.html"> <code class="code">LevelDb</code></a></li>
+<li><a href="code_MoreLevelDb.html"> <code class="code">MoreLevelDb</code></a></li>
+</OL>
+
+<p>
+
+<div class="h8" id="8_Appendix">Appendix </div>
+The appendix contains miscellaneous programs and snippets on topics that may be
+useful, but not necessary, to writing distributed systems.
+<p>
+
+<div class="h9" id="9_HTTP">HTTP</div>
+<OL>
+<li><a href="code_HelloServer.html"> <code class="code">HelloServer</code></a></li>
+<li><a href="code_HelloGetServer.html"> <code class="code">HelloGetServer</code></a></li>
+<li><a href="code_HelloHtmlServer.html"> <code class="code">HelloHtmlServer</code></a></li>
+</OL>
+<br>
+</body>
+</html>

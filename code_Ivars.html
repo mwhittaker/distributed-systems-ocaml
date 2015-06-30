@@ -1,0 +1,131 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>Ivars</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;In&nbsp;this&nbsp;program,&nbsp;we'll&nbsp;explore&nbsp;ivars.&nbsp;Ivars&nbsp;are&nbsp;very&nbsp;low-level&nbsp;async<br>
+&nbsp;*&nbsp;primitive&nbsp;that&nbsp;you&nbsp;seldom&nbsp;use.&nbsp;Often,&nbsp;you&nbsp;can&nbsp;solve&nbsp;all&nbsp;your&nbsp;async&nbsp;problems<br>
+&nbsp;*&nbsp;with&nbsp;deferreds&nbsp;and&nbsp;bind,&nbsp;but&nbsp;at&nbsp;times&nbsp;ivars&nbsp;become&nbsp;useful&nbsp;or&nbsp;even&nbsp;necessary.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Recall&nbsp;that&nbsp;I&nbsp;like&nbsp;to&nbsp;think&nbsp;of&nbsp;deferreds&nbsp;as&nbsp;cardboard&nbsp;boxes&nbsp;that&nbsp;are&nbsp;full<br>
+&nbsp;*&nbsp;with&nbsp;some&nbsp;value&nbsp;when&nbsp;determined&nbsp;and&nbsp;empty&nbsp;otherwise.&nbsp;Up&nbsp;until&nbsp;now,&nbsp;whenever<br>
+&nbsp;*&nbsp;we've&nbsp;gotten&nbsp;our&nbsp;hands&nbsp;on&nbsp;a&nbsp;deferred,&nbsp;we've&nbsp;never&nbsp;been&nbsp;the&nbsp;ones&nbsp;to&nbsp;determine<br>
+&nbsp;*&nbsp;it&nbsp;and&nbsp;put&nbsp;the&nbsp;value&nbsp;in&nbsp;the&nbsp;box.&nbsp;For&nbsp;example,&nbsp;the&nbsp;deferred&nbsp;(after&nbsp;(sec&nbsp;1.0))<br>
+&nbsp;*&nbsp;is&nbsp;determined&nbsp;after&nbsp;1&nbsp;second,&nbsp;but&nbsp;not&nbsp;by&nbsp;us!&nbsp;We&nbsp;never&nbsp;write&nbsp;the&nbsp;code&nbsp;which<br>
+&nbsp;*&nbsp;actually&nbsp;determines&nbsp;the&nbsp;value&nbsp;of&nbsp;the&nbsp;deferred.&nbsp;Well&nbsp;now&nbsp;we&nbsp;can&nbsp;with&nbsp;the<br>
+&nbsp;*&nbsp;power&nbsp;of&nbsp;ivars.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Dealing&nbsp;with&nbsp;ivars&nbsp;boils&nbsp;to&nbsp;down&nbsp;to&nbsp;a&nbsp;handful&nbsp;of&nbsp;functions.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;1.&nbsp;Ivar.create&nbsp;creates&nbsp;a&nbsp;brand&nbsp;new&nbsp;ivar.<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;2.&nbsp;Ivar.read&nbsp;i&nbsp;creates&nbsp;a&nbsp;deferred&nbsp;from&nbsp;an&nbsp;ivar.<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;3.&nbsp;Ivar.fill&nbsp;i&nbsp;x&nbsp;fills&nbsp;in&nbsp;any&nbsp;deferreds&nbsp;produced&nbsp;by&nbsp;Ivar.read.<br>
+&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;In&nbsp;this&nbsp;function,&nbsp;we&nbsp;create&nbsp;an&nbsp;ivar&nbsp;i.&nbsp;Then,&nbsp;we&nbsp;schedule&nbsp;the&nbsp;ivar&nbsp;to&nbsp;be<br>
+&nbsp;*&nbsp;filled&nbsp;with&nbsp;the&nbsp;string&nbsp;"hello"&nbsp;after&nbsp;1&nbsp;second.&nbsp;We&nbsp;then&nbsp;take&nbsp;the&nbsp;deferred&nbsp;d<br>
+&nbsp;*&nbsp;read&nbsp;from&nbsp;i&nbsp;and&nbsp;map&nbsp;it&nbsp;into&nbsp;print_endline.&nbsp;After&nbsp;1&nbsp;second,&nbsp;this&nbsp;function<br>
+&nbsp;*&nbsp;will&nbsp;print&nbsp;"hello".&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;basics&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;i&nbsp;=&nbsp;<span class="constructor">Ivar</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(after&nbsp;(sec&nbsp;1.0)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ivar</span>.fill&nbsp;i&nbsp;<span class="string">"hello"</span>);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;d&nbsp;=&nbsp;<span class="constructor">Ivar</span>.read&nbsp;i&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;d&nbsp;&gt;&gt;|&nbsp;print_endline<br>
+<br>
+<span class="comment">(*&nbsp;What&nbsp;happens&nbsp;if&nbsp;we&nbsp;try&nbsp;to&nbsp;fill&nbsp;an&nbsp;ivar&nbsp;twice?&nbsp;Uncomment&nbsp;the&nbsp;following&nbsp;code<br>
+&nbsp;*&nbsp;and&nbsp;try&nbsp;for&nbsp;yourself.&nbsp;The&nbsp;code&nbsp;creates&nbsp;an&nbsp;ivar&nbsp;and&nbsp;schedules&nbsp;for&nbsp;it&nbsp;to&nbsp;be<br>
+&nbsp;*&nbsp;filled&nbsp;with&nbsp;"ocaml"&nbsp;after&nbsp;1&nbsp;second&nbsp;and&nbsp;with&nbsp;"haskell"&nbsp;after&nbsp;2&nbsp;seconds.&nbsp;It<br>
+&nbsp;*&nbsp;then&nbsp;maps&nbsp;the&nbsp;deferred&nbsp;read&nbsp;from&nbsp;the&nbsp;ivar&nbsp;into&nbsp;print_endline.&nbsp;After&nbsp;1<br>
+&nbsp;*&nbsp;second,&nbsp;the&nbsp;ivar&nbsp;is&nbsp;filled&nbsp;and&nbsp;the&nbsp;deferred&nbsp;becomes&nbsp;determined.&nbsp;At&nbsp;this<br>
+&nbsp;*&nbsp;point,&nbsp;"ocaml"&nbsp;is&nbsp;printed&nbsp;to&nbsp;the&nbsp;screen.&nbsp;A&nbsp;second&nbsp;later&nbsp;though,&nbsp;we&nbsp;attempt<br>
+&nbsp;*&nbsp;to&nbsp;fill&nbsp;the&nbsp;ivar&nbsp;with&nbsp;"haskell",&nbsp;but&nbsp;the&nbsp;ivar&nbsp;is&nbsp;already&nbsp;filled&nbsp;and&nbsp;our<br>
+&nbsp;*&nbsp;program&nbsp;crashes.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;The&nbsp;moral&nbsp;of&nbsp;the&nbsp;story&nbsp;is&nbsp;to&nbsp;never&nbsp;fill&nbsp;an&nbsp;ivar&nbsp;more&nbsp;than&nbsp;once!&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;choices_fill&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="comment">(*<br>
+&nbsp;&nbsp;let&nbsp;i&nbsp;=&nbsp;Ivar.create&nbsp;()&nbsp;in<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(Deferred.all_unit&nbsp;[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;2.)&nbsp;&gt;&gt;|&nbsp;fun&nbsp;()&nbsp;-&gt;&nbsp;Ivar.fill&nbsp;i&nbsp;"haskell");<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.)&nbsp;&gt;&gt;|&nbsp;fun&nbsp;()&nbsp;-&gt;&nbsp;Ivar.fill&nbsp;i&nbsp;"ocaml");<br>
+&nbsp;&nbsp;]);<br>
+&nbsp;&nbsp;Ivar.read&nbsp;i&nbsp;&gt;&gt;=&nbsp;fun&nbsp;s&nbsp;-&gt;<br>
+&nbsp;&nbsp;print_endline&nbsp;s;<br>
+&nbsp;&nbsp;*)</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="comment">(*&nbsp;Luckily,&nbsp;it's&nbsp;easy&nbsp;to&nbsp;avoid&nbsp;filling&nbsp;an&nbsp;ivar&nbsp;more&nbsp;than&nbsp;once.&nbsp;We&nbsp;simply&nbsp;have<br>
+&nbsp;*&nbsp;to&nbsp;use&nbsp;Ivar.fill_if_empty&nbsp;instead&nbsp;of&nbsp;Ivar.fill.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;choices_fill_if_empty&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;i&nbsp;=&nbsp;<span class="constructor">Ivar</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Deferred</span>.all_unit&nbsp;[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;2.)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ivar</span>.fill_if_empty&nbsp;i&nbsp;<span class="string">"idris"</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ivar</span>.fill_if_empty&nbsp;i&nbsp;<span class="string">"coq"</span>);<br>
+&nbsp;&nbsp;]);<br>
+&nbsp;&nbsp;<span class="constructor">Ivar</span>.read&nbsp;i&nbsp;&gt;&gt;|&nbsp;print_endline<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;basics&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;choices_fill&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;choices_fill_if_empty&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

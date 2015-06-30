@@ -1,0 +1,105 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>MoreChoices.D</title>
+</head>
+<body>
+<code class="code"><span class="keyword">struct</span><br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;First&nbsp;up,&nbsp;both.&nbsp;Recall&nbsp;from&nbsp;earlier&nbsp;that&nbsp;we&nbsp;can&nbsp;think&nbsp;of&nbsp;binds&nbsp;as&nbsp;let<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;expressions.&nbsp;If&nbsp;we&nbsp;make&nbsp;this&nbsp;mental&nbsp;substitution,&nbsp;we&nbsp;get&nbsp;the&nbsp;following<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;code:<br>
+&nbsp;&nbsp;&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;let&nbsp;a&nbsp;=&nbsp;a&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;let&nbsp;b&nbsp;=&nbsp;b&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;(a,&nbsp;b)<br>
+&nbsp;&nbsp;&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;Pretty&nbsp;simple,&nbsp;huh?&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;both&nbsp;(a:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Deferred</span>.t)&nbsp;(b:&nbsp;<span class="keywordsign">'</span>b&nbsp;<span class="constructor">Deferred</span>.t)&nbsp;:&nbsp;(<span class="keywordsign">'</span>a&nbsp;*&nbsp;<span class="keywordsign">'</span>b)&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;a&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;a&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;b&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;b&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;return&nbsp;(a,&nbsp;b)<br>
+<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;Next&nbsp;up,&nbsp;all.&nbsp;Like&nbsp;with&nbsp;both,&nbsp;we&nbsp;can&nbsp;generally&nbsp;ignore&nbsp;the&nbsp;fact&nbsp;that&nbsp;we're<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;dealing&nbsp;with&nbsp;deferreds&nbsp;and&nbsp;think&nbsp;of&nbsp;the&nbsp;code&nbsp;as&nbsp;if&nbsp;it&nbsp;were&nbsp;full&nbsp;of&nbsp;let<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;expressions&nbsp;instead&nbsp;of&nbsp;binds.<br>
+&nbsp;&nbsp;&nbsp;*<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;let&nbsp;all&nbsp;ds&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;List.fold_left&nbsp;ds&nbsp;~init:[]&nbsp;~f:(fun&nbsp;a&nbsp;d&nbsp;-&gt;<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;a&nbsp;=&nbsp;a&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;x&nbsp;=&nbsp;d&nbsp;in<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;x::a<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;|&gt;&nbsp;List.rev<br>
+&nbsp;&nbsp;&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;all&nbsp;(ds:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Deferred</span>.t&nbsp;list)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;list&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">List</span>.fold_left&nbsp;(ds)&nbsp;~init:(return&nbsp;[])&nbsp;~f:(<span class="keyword">fun</span>&nbsp;a&nbsp;d&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;a&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;(x::a)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;)&nbsp;&gt;&gt;|&nbsp;<span class="constructor">List</span>.rev<br>
+<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;any&nbsp;is&nbsp;the&nbsp;trickiest&nbsp;of&nbsp;the&nbsp;bunch.&nbsp;If&nbsp;we&nbsp;limit&nbsp;ourselves&nbsp;to&nbsp;using&nbsp;only<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;binds,&nbsp;we&nbsp;get&nbsp;stuck.&nbsp;Instead,&nbsp;we&nbsp;have&nbsp;to&nbsp;use&nbsp;ivars.&nbsp;First,&nbsp;we&nbsp;read&nbsp;off&nbsp;an<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;empty&nbsp;deferred&nbsp;from&nbsp;a&nbsp;fresh&nbsp;ivar.&nbsp;Then,&nbsp;we&nbsp;iterate&nbsp;over&nbsp;the&nbsp;list&nbsp;of<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;deferreds&nbsp;and&nbsp;register&nbsp;them&nbsp;to&nbsp;fill&nbsp;the&nbsp;ivar&nbsp;whenever&nbsp;they&nbsp;become<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;determined.&nbsp;The&nbsp;deferreds&nbsp;are&nbsp;all&nbsp;racing&nbsp;to&nbsp;fill&nbsp;in&nbsp;the&nbsp;ivar,&nbsp;and&nbsp;the<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;first&nbsp;one&nbsp;to&nbsp;become&nbsp;determined&nbsp;gets&nbsp;to&nbsp;fill&nbsp;the&nbsp;ivar&nbsp;which&nbsp;in&nbsp;turn<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;determines&nbsp;the&nbsp;deferred&nbsp;read&nbsp;from&nbsp;it.&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;any&nbsp;(ds:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Deferred</span>.t&nbsp;list)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;i&nbsp;=&nbsp;<span class="constructor">Ivar</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Deferred</span>.<span class="constructor">List</span>.iter&nbsp;~how:<span class="keywordsign">`</span><span class="constructor">Parallel</span>&nbsp;ds&nbsp;~f:(<span class="keyword">fun</span>&nbsp;d&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;d&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Ivar</span>.fill_if_empty&nbsp;i&nbsp;x)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;|&gt;&nbsp;don't_wait_for;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Ivar</span>.read&nbsp;i<br>
+<span class="keyword">end</span></code></body></html>

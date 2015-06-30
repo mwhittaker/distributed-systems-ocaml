@@ -1,0 +1,179 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>Choices</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;Now&nbsp;that&nbsp;we've&nbsp;seen&nbsp;deferreds,&nbsp;return,&nbsp;bind,&nbsp;and&nbsp;map,&nbsp;let's&nbsp;dive&nbsp;into&nbsp;some<br>
+&nbsp;*&nbsp;more&nbsp;advanced&nbsp;ways&nbsp;of&nbsp;interacting&nbsp;with&nbsp;deferreds.&nbsp;In&nbsp;particular,&nbsp;we'll&nbsp;see<br>
+&nbsp;*&nbsp;how&nbsp;to&nbsp;wait&nbsp;for&nbsp;a&nbsp;set&nbsp;of&nbsp;deferreds&nbsp;to&nbsp;become&nbsp;determined&nbsp;or&nbsp;wait&nbsp;for&nbsp;one&nbsp;of<br>
+&nbsp;*&nbsp;many&nbsp;deferreds&nbsp;to&nbsp;become&nbsp;determined.&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;Before&nbsp;we&nbsp;get&nbsp;into&nbsp;choosing&nbsp;from&nbsp;a&nbsp;set&nbsp;of&nbsp;deferreds,&nbsp;let's&nbsp;explore&nbsp;how&nbsp;to<br>
+&nbsp;*&nbsp;create&nbsp;deferreds&nbsp;that&nbsp;don't&nbsp;become&nbsp;determined&nbsp;for&nbsp;a&nbsp;while.&nbsp;We've&nbsp;seen&nbsp;that<br>
+&nbsp;*&nbsp;we&nbsp;can&nbsp;use&nbsp;return&nbsp;to&nbsp;create&nbsp;a&nbsp;deferred&nbsp;that&nbsp;is&nbsp;immediately&nbsp;determined.&nbsp;We<br>
+&nbsp;*&nbsp;can&nbsp;use&nbsp;after&nbsp;and&nbsp;sec&nbsp;to&nbsp;create&nbsp;a&nbsp;deferred&nbsp;that&nbsp;becomes&nbsp;determined&nbsp;after&nbsp;a<br>
+&nbsp;*&nbsp;while.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;The&nbsp;sec&nbsp;function&nbsp;creates&nbsp;a&nbsp;time&nbsp;span&nbsp;in&nbsp;seconds.&nbsp;For&nbsp;example,&nbsp;`sec&nbsp;1.`<br>
+&nbsp;*&nbsp;represents&nbsp;a&nbsp;1&nbsp;second&nbsp;time&nbsp;span.&nbsp;The&nbsp;after&nbsp;function&nbsp;takes&nbsp;in&nbsp;a&nbsp;timespan&nbsp;t<br>
+&nbsp;*&nbsp;and&nbsp;evaluates&nbsp;to&nbsp;a&nbsp;unit&nbsp;deferred&nbsp;that&nbsp;is&nbsp;determined&nbsp;after&nbsp;t&nbsp;has&nbsp;ended.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;This&nbsp;function&nbsp;will&nbsp;print&nbsp;1&nbsp;after&nbsp;1&nbsp;second,&nbsp;2&nbsp;after&nbsp;2&nbsp;seconds,&nbsp;and&nbsp;3&nbsp;after&nbsp;3<br>
+&nbsp;*&nbsp;seconds.<br>
+&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;time&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;after&nbsp;(sec&nbsp;1.)&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"%d\n"</span>&nbsp;1;<br>
+&nbsp;&nbsp;after&nbsp;(sec&nbsp;1.)&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"%d\n"</span>&nbsp;2;<br>
+&nbsp;&nbsp;after&nbsp;(sec&nbsp;1.)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;printf&nbsp;<span class="string">"%d\n"</span>&nbsp;3<br>
+<br>
+<span class="comment">(*&nbsp;We&nbsp;can&nbsp;use&nbsp;after&nbsp;and&nbsp;sec&nbsp;to&nbsp;create&nbsp;a&nbsp;helper&nbsp;function&nbsp;delayed&nbsp;that&nbsp;evaluates<br>
+&nbsp;*&nbsp;to&nbsp;a&nbsp;deferred&nbsp;which&nbsp;becomes&nbsp;determined&nbsp;with&nbsp;some&nbsp;value&nbsp;after&nbsp;some&nbsp;time.&nbsp;For<br>
+&nbsp;*&nbsp;example,&nbsp;`delayed&nbsp;1.2&nbsp;"hello"`&nbsp;evaluates&nbsp;a&nbsp;deferred&nbsp;that&nbsp;after&nbsp;1.2&nbsp;seconds<br>
+&nbsp;*&nbsp;becomes&nbsp;determined&nbsp;with&nbsp;the&nbsp;string&nbsp;"hello".&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;delayed&nbsp;(t:&nbsp;float)&nbsp;(x:&nbsp;<span class="keywordsign">'</span>a)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;after&nbsp;(sec&nbsp;t)&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;x<br>
+<br>
+<span class="comment">(*&nbsp;Now&nbsp;that&nbsp;we&nbsp;can&nbsp;create&nbsp;delayed&nbsp;deferreds&nbsp;with&nbsp;our&nbsp;delayed&nbsp;function,&nbsp;we&nbsp;can<br>
+&nbsp;*&nbsp;start&nbsp;choosing&nbsp;from&nbsp;a&nbsp;set&nbsp;of&nbsp;deferreds.&nbsp;First&nbsp;up,&nbsp;Deferred.all.&nbsp;Deferred.all<br>
+&nbsp;*&nbsp;takes&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;deferreds&nbsp;(i.e.&nbsp;'a&nbsp;Deferred.t&nbsp;list),&nbsp;and&nbsp;returns&nbsp;a&nbsp;single<br>
+&nbsp;*&nbsp;list&nbsp;that&nbsp;is&nbsp;deferred&nbsp;(i.e.&nbsp;'a&nbsp;list&nbsp;Deferred.t).&nbsp;Once&nbsp;every&nbsp;deferred&nbsp;in&nbsp;the<br>
+&nbsp;*&nbsp;input&nbsp;list&nbsp;becomes&nbsp;determined,&nbsp;the&nbsp;output&nbsp;list&nbsp;also&nbsp;becomes&nbsp;determined,&nbsp;and<br>
+&nbsp;*&nbsp;it&nbsp;contains&nbsp;all&nbsp;the&nbsp;values&nbsp;of&nbsp;the&nbsp;input&nbsp;list.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;For&nbsp;example,&nbsp;this&nbsp;function&nbsp;creates&nbsp;a&nbsp;list&nbsp;with&nbsp;three&nbsp;deferreds.&nbsp;The&nbsp;first<br>
+&nbsp;*&nbsp;becomes&nbsp;determined&nbsp;after&nbsp;0.5&nbsp;seconds.&nbsp;The&nbsp;second&nbsp;becomes&nbsp;determined&nbsp;after&nbsp;1<br>
+&nbsp;*&nbsp;second,&nbsp;and&nbsp;the&nbsp;last&nbsp;becomes&nbsp;determined&nbsp;after&nbsp;1.5&nbsp;seconds.&nbsp;After&nbsp;1.5&nbsp;seconds<br>
+&nbsp;*&nbsp;of&nbsp;calling&nbsp;Deferred.all,&nbsp;all&nbsp;three&nbsp;deferreds&nbsp;will&nbsp;have&nbsp;been&nbsp;determined,&nbsp;and<br>
+&nbsp;*&nbsp;the&nbsp;output&nbsp;list&nbsp;will&nbsp;become&nbsp;determined&nbsp;with&nbsp;the&nbsp;value&nbsp;["hello";&nbsp;"world";<br>
+&nbsp;*&nbsp;"!"].&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;def_all&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.all&nbsp;[delayed&nbsp;0.5&nbsp;<span class="string">"hello"</span>;&nbsp;delayed&nbsp;1.&nbsp;<span class="string">"world"</span>;&nbsp;delayed&nbsp;1.5&nbsp;<span class="string">"!"</span>]&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;l&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;<span class="constructor">List</span>.iter&nbsp;l&nbsp;~f:(print_endline)<br>
+<br>
+<span class="comment">(*&nbsp;Deferred.all_unit&nbsp;is&nbsp;similar&nbsp;to&nbsp;Deferred.all,&nbsp;except&nbsp;it&nbsp;only&nbsp;accepts&nbsp;a&nbsp;list<br>
+&nbsp;*&nbsp;of&nbsp;unit&nbsp;deferreds,&nbsp;and&nbsp;instead&nbsp;of&nbsp;returning&nbsp;a&nbsp;deferred&nbsp;list&nbsp;of&nbsp;units,&nbsp;it<br>
+&nbsp;*&nbsp;simple&nbsp;returns&nbsp;a&nbsp;unit&nbsp;deferred.&nbsp;When&nbsp;we&nbsp;run&nbsp;this&nbsp;code,&nbsp;"hello"&nbsp;will&nbsp;print<br>
+&nbsp;*&nbsp;after&nbsp;0.5&nbsp;seconds,&nbsp;"world"&nbsp;will&nbsp;print&nbsp;after&nbsp;1&nbsp;second,&nbsp;and&nbsp;"!"&nbsp;will&nbsp;print<br>
+&nbsp;*&nbsp;after&nbsp;1.5&nbsp;seconds.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;def_all_unit&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.all_unit&nbsp;[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;0.5)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"hello"</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.0)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"world"</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.5)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"!"</span>);<br>
+&nbsp;&nbsp;]<br>
+<br>
+<span class="comment">(*&nbsp;Whereas&nbsp;Deferred.all&nbsp;returned&nbsp;a&nbsp;deferred&nbsp;that&nbsp;became&nbsp;determined&nbsp;with&nbsp;*every*<br>
+&nbsp;*&nbsp;value&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;deferreds,&nbsp;Deferred.any&nbsp;returns&nbsp;a&nbsp;deferred&nbsp;that&nbsp;is<br>
+&nbsp;*&nbsp;determined&nbsp;with&nbsp;the&nbsp;*first*&nbsp;value&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;deferreds&nbsp;that&nbsp;becomes<br>
+&nbsp;*&nbsp;determined.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;In&nbsp;this&nbsp;code,&nbsp;we&nbsp;create&nbsp;a&nbsp;list&nbsp;of&nbsp;two&nbsp;deferreds.&nbsp;The&nbsp;"fast!"&nbsp;deferred<br>
+&nbsp;*&nbsp;becomes&nbsp;determined&nbsp;after&nbsp;half&nbsp;a&nbsp;second,&nbsp;and&nbsp;the&nbsp;"slow!"&nbsp;deferred&nbsp;becomes<br>
+&nbsp;*&nbsp;determined&nbsp;after&nbsp;one&nbsp;second.&nbsp;Since&nbsp;the&nbsp;"fast!"&nbsp;deferred&nbsp;becomes&nbsp;determined<br>
+&nbsp;*&nbsp;first,&nbsp;the&nbsp;deferred&nbsp;returned&nbsp;by&nbsp;our&nbsp;call&nbsp;to&nbsp;Deferred.any&nbsp;will&nbsp;evaluate&nbsp;to<br>
+&nbsp;*&nbsp;"fast!".&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;def_any&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.any&nbsp;[delayed&nbsp;0.5&nbsp;<span class="string">"fast!"</span>;&nbsp;delayed&nbsp;1.0&nbsp;<span class="string">"slow!"</span>]&nbsp;&gt;&gt;|&nbsp;print_endline<br>
+<br>
+<span class="comment">(*&nbsp;Deferred.all_unit&nbsp;is&nbsp;to&nbsp;Deferred.all&nbsp;as&nbsp;Deferred.any_unit&nbsp;is&nbsp;to<br>
+&nbsp;*&nbsp;Deferred.any.&nbsp;Expectedly,&nbsp;this&nbsp;code&nbsp;will&nbsp;return&nbsp;a&nbsp;unit&nbsp;deferred&nbsp;that&nbsp;is<br>
+&nbsp;*&nbsp;determined&nbsp;after&nbsp;0.5&nbsp;seconds&nbsp;when&nbsp;the&nbsp;"fast"&nbsp;deferred&nbsp;is&nbsp;determined.&nbsp;Perhaps<br>
+&nbsp;*&nbsp;unexpectedly,&nbsp;"slow"&nbsp;and&nbsp;"slowest"&nbsp;may&nbsp;still&nbsp;be&nbsp;printed!<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Why&nbsp;is&nbsp;that?<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Here,&nbsp;it's&nbsp;good&nbsp;to&nbsp;remember&nbsp;that&nbsp;&gt;&gt;|&nbsp;and&nbsp;&gt;&gt;=&nbsp;register&nbsp;functions&nbsp;to&nbsp;be&nbsp;called<br>
+&nbsp;*&nbsp;when&nbsp;certain&nbsp;deferreds&nbsp;become&nbsp;determined.&nbsp;When&nbsp;we&nbsp;evaluate&nbsp;this&nbsp;code,&nbsp;we<br>
+&nbsp;*&nbsp;first&nbsp;evaluate&nbsp;the&nbsp;list,&nbsp;which&nbsp;contains&nbsp;three&nbsp;elements.&nbsp;Each&nbsp;element&nbsp;is&nbsp;the<br>
+&nbsp;*&nbsp;evaluation&nbsp;of&nbsp;an&nbsp;invocation&nbsp;to&nbsp;&gt;&gt;|,&nbsp;so&nbsp;all&nbsp;three&nbsp;print_endlines&nbsp;are<br>
+&nbsp;*&nbsp;registered.&nbsp;Even&nbsp;after&nbsp;0.5&nbsp;seconds&nbsp;when&nbsp;"fast"&nbsp;is&nbsp;printed&nbsp;and&nbsp;the&nbsp;deferred<br>
+&nbsp;*&nbsp;returned&nbsp;by&nbsp;def_any_unit&nbsp;becomes&nbsp;determined,&nbsp;the&nbsp;print_endline&nbsp;"slow"&nbsp;and<br>
+&nbsp;*&nbsp;print_endline&nbsp;"slowest"&nbsp;functions&nbsp;are&nbsp;still&nbsp;registered&nbsp;and&nbsp;waiting&nbsp;to&nbsp;go.&nbsp;So<br>
+&nbsp;*&nbsp;depending&nbsp;on&nbsp;how&nbsp;much&nbsp;time&nbsp;remains&nbsp;after&nbsp;this&nbsp;function&nbsp;is&nbsp;called&nbsp;and&nbsp;when<br>
+&nbsp;*&nbsp;the&nbsp;program&nbsp;terminates,&nbsp;"slow"&nbsp;and&nbsp;"slowest"&nbsp;may&nbsp;or&nbsp;may&nbsp;not&nbsp;be&nbsp;printed!<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;You&nbsp;can&nbsp;try&nbsp;experimenting&nbsp;with&nbsp;this&nbsp;by&nbsp;removing&nbsp;the&nbsp;invocation&nbsp;of&nbsp;def_both<br>
+&nbsp;*&nbsp;in&nbsp;the&nbsp;main&nbsp;function&nbsp;below&nbsp;and&nbsp;see&nbsp;how&nbsp;it&nbsp;affects&nbsp;whether&nbsp;or&nbsp;not&nbsp;"slow"&nbsp;and<br>
+&nbsp;*&nbsp;"slowest"&nbsp;are&nbsp;printed.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;def_any_unit&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.any_unit&nbsp;[<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;0.5)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"fast"</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.0)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"slow"</span>);<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(after&nbsp;(sec&nbsp;1.5)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"slowest"</span>);<br>
+&nbsp;&nbsp;]<br>
+<br>
+<span class="comment">(*&nbsp;Deferred.both&nbsp;a&nbsp;b&nbsp;acts&nbsp;the&nbsp;same&nbsp;as&nbsp;Deferred.all&nbsp;[a;&nbsp;b]&nbsp;but&nbsp;returns&nbsp;a&nbsp;tuple<br>
+&nbsp;*&nbsp;instead&nbsp;of&nbsp;a&nbsp;list.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;def_both&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.both&nbsp;(delayed&nbsp;1.&nbsp;<span class="string">"hello"</span>)&nbsp;(delayed&nbsp;0.5&nbsp;42)&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;(a,&nbsp;b)&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"%s,&nbsp;%d\n"</span>&nbsp;a&nbsp;b<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;time&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;def_all&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;def_all_unit&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;def_any&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;def_any_unit&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;def_both&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

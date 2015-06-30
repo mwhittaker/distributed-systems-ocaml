@@ -1,0 +1,112 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>PrintServer</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;In&nbsp;this&nbsp;program,&nbsp;we'll&nbsp;write&nbsp;a&nbsp;very&nbsp;simple&nbsp;TCP&nbsp;server.&nbsp;The&nbsp;server&nbsp;will&nbsp;read<br>
+&nbsp;*&nbsp;a&nbsp;single&nbsp;line&nbsp;from&nbsp;a&nbsp;client,&nbsp;print&nbsp;it&nbsp;out,&nbsp;and&nbsp;then&nbsp;close&nbsp;the&nbsp;connection.&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span>&nbsp;<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;Async's&nbsp;TCP&nbsp;library&nbsp;has&nbsp;a&nbsp;function&nbsp;Tcp.Server.create&nbsp;which&nbsp;allows&nbsp;us&nbsp;to&nbsp;very<br>
+&nbsp;*&nbsp;easily&nbsp;create&nbsp;a&nbsp;TCP&nbsp;server.&nbsp;Tcp.Server.create&nbsp;takes&nbsp;in&nbsp;two&nbsp;arguments:&nbsp;the<br>
+&nbsp;*&nbsp;internet&nbsp;address&nbsp;on&nbsp;which&nbsp;to&nbsp;listen&nbsp;and&nbsp;a&nbsp;function.&nbsp;When&nbsp;we&nbsp;call&nbsp;create,&nbsp;it<br>
+&nbsp;*&nbsp;starts&nbsp;a&nbsp;TCP&nbsp;server.&nbsp;Whenever&nbsp;a&nbsp;client&nbsp;connects&nbsp;to&nbsp;the&nbsp;server,&nbsp;a&nbsp;Reader.t<br>
+&nbsp;*&nbsp;and&nbsp;Writer.t&nbsp;are&nbsp;formed&nbsp;from&nbsp;the&nbsp;TCP&nbsp;connection&nbsp;and&nbsp;passed&nbsp;to&nbsp;the&nbsp;function<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;we&nbsp;gave&nbsp;to&nbsp;Tcp.Server.create.&nbsp;*)</span><br>
+<br>
+<span class="comment">(*&nbsp;Here,&nbsp;printer&nbsp;is&nbsp;the&nbsp;function&nbsp;we'll&nbsp;pass&nbsp;to&nbsp;Tcp.Server.create.&nbsp;The&nbsp;first<br>
+&nbsp;*&nbsp;argument&nbsp;is&nbsp;the&nbsp;address&nbsp;of&nbsp;the&nbsp;client,&nbsp;which&nbsp;we'll&nbsp;rarely&nbsp;use.&nbsp;The&nbsp;second<br>
+&nbsp;*&nbsp;and&nbsp;third&nbsp;are&nbsp;the&nbsp;Reader.t&nbsp;and&nbsp;Writer.t&nbsp;of&nbsp;the&nbsp;underlying&nbsp;TCP&nbsp;connection.<br>
+&nbsp;*&nbsp;Since&nbsp;we're&nbsp;not&nbsp;going&nbsp;to&nbsp;use&nbsp;the&nbsp;address&nbsp;or&nbsp;writer,&nbsp;we&nbsp;bind&nbsp;them&nbsp;to&nbsp;_,&nbsp;and<br>
+&nbsp;*&nbsp;since&nbsp;we&nbsp;are&nbsp;going&nbsp;to&nbsp;use&nbsp;the&nbsp;writer,&nbsp;we&nbsp;bind&nbsp;it&nbsp;to&nbsp;the&nbsp;variable&nbsp;r.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;printer&nbsp;_&nbsp;r&nbsp;_&nbsp;=<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;In&nbsp;the&nbsp;previous&nbsp;chapter,&nbsp;we&nbsp;saw&nbsp;how&nbsp;to&nbsp;interact&nbsp;with&nbsp;readers&nbsp;and&nbsp;writers<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;using&nbsp;files&nbsp;and&nbsp;stdin.&nbsp;Now&nbsp;we're&nbsp;dealing&nbsp;with&nbsp;TCP&nbsp;conncetions,&nbsp;but<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;nothing's&nbsp;changed.&nbsp;We&nbsp;read&nbsp;a&nbsp;line&nbsp;from&nbsp;a&nbsp;TCP&nbsp;connection&nbsp;the&nbsp;same&nbsp;way&nbsp;we<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;read&nbsp;a&nbsp;line&nbsp;from&nbsp;a&nbsp;file&nbsp;or&nbsp;from&nbsp;stdin!&nbsp;This&nbsp;means&nbsp;we&nbsp;don't&nbsp;have&nbsp;to&nbsp;learn<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;anything&nbsp;new&nbsp;in&nbsp;order&nbsp;to&nbsp;be&nbsp;familiar&nbsp;with&nbsp;network&nbsp;programming&nbsp;in&nbsp;OCaml.&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="constructor">Reader</span>.read_line&nbsp;r&nbsp;&gt;&gt;|&nbsp;<span class="keyword">function</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Eof</span>&nbsp;&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;<span class="string">"error"</span><br>
+&nbsp;&nbsp;<span class="keywordsign">|</span>&nbsp;<span class="keywordsign">`</span><span class="constructor">Ok</span>&nbsp;s&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;print_endline&nbsp;s<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;In&nbsp;order&nbsp;to&nbsp;launch&nbsp;the&nbsp;server,&nbsp;we&nbsp;first&nbsp;choose&nbsp;the&nbsp;server's&nbsp;port.&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;port&nbsp;=&nbsp;8080&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"listening&nbsp;on&nbsp;port&nbsp;%d\n"</span>&nbsp;port;<br>
+<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;Then,&nbsp;we&nbsp;Tcp.on_port&nbsp;to&nbsp;create&nbsp;a&nbsp;description&nbsp;of&nbsp;the&nbsp;socket&nbsp;the&nbsp;TCP&nbsp;server<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;should&nbsp;listen&nbsp;on.&nbsp;*)</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;where_to_listen&nbsp;=&nbsp;<span class="constructor">Tcp</span>.on_port&nbsp;port&nbsp;<span class="keyword">in</span><br>
+<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;Finally,&nbsp;we&nbsp;create&nbsp;the&nbsp;server&nbsp;with&nbsp;Tcp.Server.create.&nbsp;create&nbsp;returns&nbsp;an<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;object&nbsp;of&nbsp;type&nbsp;Tcp.Server.t,&nbsp;but&nbsp;we&nbsp;won't&nbsp;use&nbsp;the&nbsp;server,&nbsp;so&nbsp;we&nbsp;ignore&nbsp;it.<br>
+&nbsp;&nbsp;&nbsp;*)</span><br>
+&nbsp;&nbsp;ignore&nbsp;(<span class="constructor">Tcp</span>.<span class="constructor">Server</span>.create&nbsp;where_to_listen&nbsp;printer);<br>
+<br>
+&nbsp;&nbsp;<span class="comment">(*&nbsp;We&nbsp;want&nbsp;our&nbsp;TCP&nbsp;server&nbsp;to&nbsp;run&nbsp;forever,&nbsp;so&nbsp;we&nbsp;return&nbsp;a&nbsp;deferred&nbsp;that&nbsp;never<br>
+&nbsp;&nbsp;&nbsp;*&nbsp;becomes&nbsp;determined!&nbsp;*)</span><br>
+&nbsp;&nbsp;never&nbsp;()<br>
+<br>
+<span class="comment">(*&nbsp;Compile&nbsp;and&nbsp;run&nbsp;this&nbsp;program.&nbsp;It&nbsp;should&nbsp;print&nbsp;"listening&nbsp;on&nbsp;port&nbsp;8080".<br>
+&nbsp;*&nbsp;Then,&nbsp;run&nbsp;the&nbsp;following&nbsp;command&nbsp;to&nbsp;connect&nbsp;to&nbsp;the&nbsp;server:&nbsp;`telnet&nbsp;localhost<br>
+&nbsp;*&nbsp;8080`.&nbsp;This&nbsp;will&nbsp;open&nbsp;up&nbsp;an&nbsp;interactive&nbsp;telnet&nbsp;shell&nbsp;that's&nbsp;connected&nbsp;to&nbsp;our<br>
+&nbsp;*&nbsp;server.&nbsp;Type&nbsp;in&nbsp;something&nbsp;and&nbsp;hit&nbsp;enter.&nbsp;The&nbsp;server&nbsp;will&nbsp;print&nbsp;out&nbsp;your<br>
+&nbsp;*&nbsp;message&nbsp;and&nbsp;then&nbsp;end&nbsp;the&nbsp;connection,&nbsp;forcing&nbsp;your&nbsp;telnet&nbsp;session&nbsp;to<br>
+&nbsp;*&nbsp;terminate.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="next" href="ArithRpc.Response.html">
+<link rel="Up" href="ArithRpc.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>ArithRpc.Request</title>
+</head>
+<body>
+<div class="navbar">&nbsp;<a class="up" href="ArithRpc.html" title="ArithRpc">Up</a>
+&nbsp;<a class="post" href="ArithRpc.Response.html" title="ArithRpc.Response">Next</a>
+</div>
+<h1>Module <a href="type_ArithRpc.Request.html">ArithRpc.Request</a> (<a href="code_ArithRpc.Request.html">.ml</a>)</h1>
+
+<pre><span class="keyword">module</span> Request: <code class="code">sig</code> <a href="ArithRpc.Request.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><code><span id="TYPEt"><span class="keyword">type</span> <code class="type"></code>t</span> = </code></pre><table class="typetable">
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Succ"><span class="constructor">Succ</span></span> <span class="keyword">of</span> <code class="type">int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Neg"><span class="constructor">Neg</span></span> <span class="keyword">of</span> <code class="type">int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Plus"><span class="constructor">Plus</span></span> <span class="keyword">of</span> <code class="type">int * int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Sub"><span class="constructor">Sub</span></span> <span class="keyword">of</span> <code class="type">int * int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Times"><span class="constructor">Times</span></span> <span class="keyword">of</span> <code class="type">int * int</code></code></td>
+
+</tr>
+<tr>
+<td align="left" valign="top" >
+<code><span class="keyword">|</span></code></td>
+<td align="left" valign="top" >
+<code><span id="TYPEELTt.Eq"><span class="constructor">Eq</span></span> <span class="keyword">of</span> <code class="type">int * int</code></code></td>
+
+</tr></table>
+
+
+
+<pre><span id="VALbin_size_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_size_t.html">bin_size_t</a></span> : <code class="type"><a href="ArithRpc.Request.html#TYPEt">t</a> -> int</code></pre>
+<pre><span id="VALbin_write_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_write_t.html">bin_write_t</a></span> : <code class="type">Bin_prot.Common.buf -><br>       pos:Bin_prot.Common.pos -> <a href="ArithRpc.Request.html#TYPEt">t</a> -> Bin_prot.Common.pos</code></pre>
+<pre><span id="VALbin_writer_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_writer_t.html">bin_writer_t</a></span> : <code class="type"><a href="ArithRpc.Request.html#TYPEt">t</a> Core.Std.Bin_prot.Type_class.writer</code></pre>
+<pre><span id="VAL__bin_read_t__"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.__bin_read_t__.html">__bin_read_t__</a></span> : <code class="type">'a -> pos_ref:Core.Std.Bin_prot.Common.pos Pervasives.ref -> 'b -> 'c</code></pre>
+<pre><span id="VALbin_read_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_read_t.html">bin_read_t</a></span> : <code class="type">Bin_prot.Common.buf -> pos_ref:Bin_prot.Common.pos_ref -> <a href="ArithRpc.Request.html#TYPEt">t</a></code></pre>
+<pre><span id="VALbin_reader_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_reader_t.html">bin_reader_t</a></span> : <code class="type"><a href="ArithRpc.Request.html#TYPEt">t</a> Core.Std.Bin_prot.Type_class.reader</code></pre>
+<pre><span id="VALbin_t"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.bin_t.html">bin_t</a></span> : <code class="type"><a href="ArithRpc.Request.html#TYPEt">t</a> Core.Std.Bin_prot.Type_class.t</code></pre>
+<pre><span id="VALto_string"><span class="keyword">val</span> <a href="code_VALArithRpc.Request.to_string.html">to_string</a></span> : <code class="type"><a href="ArithRpc.Request.html#TYPEt">t</a> -> string</code></pre></body></html>

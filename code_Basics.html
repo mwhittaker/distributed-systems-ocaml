@@ -1,0 +1,212 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>Basics</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;Now&nbsp;that&nbsp;we've&nbsp;written&nbsp;a&nbsp;hello&nbsp;world&nbsp;program,&nbsp;let's&nbsp;dive&nbsp;into&nbsp;some&nbsp;more<br>
+&nbsp;*&nbsp;meaty&nbsp;async&nbsp;code.&nbsp;Hopefully,&nbsp;most&nbsp;of&nbsp;this&nbsp;should&nbsp;be&nbsp;familiar&nbsp;to&nbsp;you&nbsp;after<br>
+&nbsp;*&nbsp;reading&nbsp;Chapter&nbsp;18&nbsp;of&nbsp;Real&nbsp;World&nbsp;OCaml.&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;First&nbsp;up,&nbsp;let's&nbsp;play&nbsp;with&nbsp;deferreds&nbsp;and&nbsp;bind.&nbsp;An&nbsp;'a&nbsp;Deferred.t&nbsp;(or<br>
+&nbsp;*&nbsp;colloquially,&nbsp;an&nbsp;'a&nbsp;deferred)&nbsp;represents&nbsp;a&nbsp;value&nbsp;of&nbsp;type&nbsp;'a&nbsp;that&nbsp;may&nbsp;or&nbsp;may<br>
+&nbsp;*&nbsp;not&nbsp;yet&nbsp;be&nbsp;determined.&nbsp;For&nbsp;example,&nbsp;consider&nbsp;calling&nbsp;a&nbsp;function<br>
+&nbsp;*&nbsp;read_line_from_stdin&nbsp;that&nbsp;reads&nbsp;a&nbsp;line&nbsp;from&nbsp;the&nbsp;user&nbsp;and&nbsp;returns&nbsp;the&nbsp;line&nbsp;as<br>
+&nbsp;*&nbsp;a&nbsp;string&nbsp;deferred.&nbsp;Now&nbsp;imagine&nbsp;you&nbsp;call&nbsp;read_line_from_stdin&nbsp;and&nbsp;get&nbsp;some<br>
+&nbsp;*&nbsp;string&nbsp;deferred&nbsp;s.&nbsp;s&nbsp;may&nbsp;or&nbsp;may&nbsp;not&nbsp;yet&nbsp;be&nbsp;determined.&nbsp;If&nbsp;the&nbsp;user&nbsp;hasn't<br>
+&nbsp;*&nbsp;typed&nbsp;in&nbsp;anything&nbsp;yet,&nbsp;then&nbsp;s&nbsp;&nbsp;hasn't&nbsp;yet&nbsp;been&nbsp;determined.&nbsp;Once&nbsp;the&nbsp;user<br>
+&nbsp;*&nbsp;types&nbsp;something&nbsp;in,&nbsp;s&nbsp;becomes&nbsp;determined&nbsp;with&nbsp;whatever&nbsp;the&nbsp;user&nbsp;typed.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;I&nbsp;like&nbsp;to&nbsp;think&nbsp;of&nbsp;deferreds&nbsp;as&nbsp;cardboard&nbsp;boxes&nbsp;that&nbsp;may&nbsp;or&nbsp;may&nbsp;not&nbsp;contain<br>
+&nbsp;*&nbsp;a&nbsp;value.&nbsp;When&nbsp;a&nbsp;deferred&nbsp;isn't&nbsp;yet&nbsp;determined,&nbsp;I&nbsp;think&nbsp;of&nbsp;it&nbsp;as&nbsp;an&nbsp;empty<br>
+&nbsp;*&nbsp;box.&nbsp;When&nbsp;a&nbsp;deferred&nbsp;is&nbsp;determined,&nbsp;I&nbsp;imagine&nbsp;the&nbsp;box&nbsp;is&nbsp;full&nbsp;with&nbsp;some<br>
+&nbsp;*&nbsp;value.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;So&nbsp;if&nbsp;you&nbsp;give&nbsp;me&nbsp;a&nbsp;deferred,&nbsp;and&nbsp;it's&nbsp;not&nbsp;yet&nbsp;determined,&nbsp;what&nbsp;do&nbsp;I&nbsp;do&nbsp;with<br>
+&nbsp;*&nbsp;it?&nbsp;Well,&nbsp;if&nbsp;the&nbsp;cardboard&nbsp;box&nbsp;is&nbsp;full,&nbsp;we&nbsp;could&nbsp;open&nbsp;it&nbsp;up,&nbsp;pull&nbsp;out&nbsp;the<br>
+&nbsp;*&nbsp;value&nbsp;and&nbsp;do&nbsp;whatever&nbsp;we&nbsp;want&nbsp;with&nbsp;it.&nbsp;But&nbsp;if&nbsp;the&nbsp;cardboard&nbsp;box&nbsp;is&nbsp;empty,<br>
+&nbsp;*&nbsp;we're&nbsp;in&nbsp;a&nbsp;bit&nbsp;of&nbsp;a&nbsp;pickle.&nbsp;We&nbsp;could&nbsp;sit&nbsp;and&nbsp;wait&nbsp;around&nbsp;twiddling&nbsp;our<br>
+&nbsp;*&nbsp;thumbs&nbsp;until&nbsp;the&nbsp;box&nbsp;is&nbsp;full&nbsp;and&nbsp;then&nbsp;unpack&nbsp;it,&nbsp;but&nbsp;that&nbsp;wouldn't&nbsp;be<br>
+&nbsp;*&nbsp;asynchronous&nbsp;at&nbsp;all&nbsp;(which,&nbsp;for&nbsp;a&nbsp;library&nbsp;named&nbsp;async,&nbsp;would&nbsp;be&nbsp;pretty<br>
+&nbsp;*&nbsp;unfortunate).<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Enter&nbsp;bind.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Bind&nbsp;is&nbsp;a&nbsp;higher&nbsp;order&nbsp;function&nbsp;that&nbsp;is&nbsp;fundamental&nbsp;to&nbsp;programming&nbsp;with<br>
+&nbsp;*&nbsp;deferreds.&nbsp;Here's&nbsp;the&nbsp;type&nbsp;of&nbsp;bind:<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;'a&nbsp;Deferred.t&nbsp;-&gt;&nbsp;('a&nbsp;-&gt;&nbsp;'b&nbsp;Deferred.t)&nbsp;-&gt;&nbsp;b'&nbsp;Deferred.t<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Let's&nbsp;call&nbsp;the&nbsp;first&nbsp;argument&nbsp;x&nbsp;and&nbsp;the&nbsp;second&nbsp;f.&nbsp;Bind&nbsp;registers&nbsp;f&nbsp;to&nbsp;be<br>
+&nbsp;*&nbsp;called&nbsp;on&nbsp;the&nbsp;value&nbsp;of&nbsp;x&nbsp;once&nbsp;it&nbsp;becomes&nbsp;determined.&nbsp;In&nbsp;other&nbsp;words,&nbsp;bind<br>
+&nbsp;*&nbsp;will&nbsp;wait&nbsp;until&nbsp;our&nbsp;cardboard&nbsp;boxes&nbsp;are&nbsp;full&nbsp;before&nbsp;passing&nbsp;their&nbsp;contents<br>
+&nbsp;*&nbsp;to&nbsp;a&nbsp;provided&nbsp;function.&nbsp;We&nbsp;can&nbsp;chain&nbsp;together&nbsp;a&nbsp;sequence&nbsp;of&nbsp;binds&nbsp;to&nbsp;create<br>
+&nbsp;*&nbsp;complex&nbsp;computations,&nbsp;as&nbsp;shown&nbsp;in&nbsp;the&nbsp;code&nbsp;below.&nbsp;*)</span><br>
+<br>
+<span class="comment">(*&nbsp;This&nbsp;function&nbsp;calls&nbsp;bind&nbsp;with&nbsp;two&nbsp;arguments.&nbsp;The&nbsp;first&nbsp;is&nbsp;(return&nbsp;1),&nbsp;which<br>
+&nbsp;*&nbsp;is&nbsp;an&nbsp;int&nbsp;deferred.&nbsp;The&nbsp;second&nbsp;is&nbsp;the&nbsp;very&nbsp;big&nbsp;function&nbsp;(fun&nbsp;x&nbsp;-&gt;&nbsp;...&nbsp;return<br>
+&nbsp;*&nbsp;()))),&nbsp;which&nbsp;is&nbsp;a&nbsp;function&nbsp;from&nbsp;int&nbsp;deferred&nbsp;to&nbsp;unit&nbsp;deferred.&nbsp;When&nbsp;(return<br>
+&nbsp;*&nbsp;1)&nbsp;becomes&nbsp;determined,&nbsp;the&nbsp;1&nbsp;is&nbsp;unwrapped&nbsp;and&nbsp;the&nbsp;very&nbsp;big&nbsp;function&nbsp;is<br>
+&nbsp;*&nbsp;called&nbsp;with&nbsp;x&nbsp;bound&nbsp;to&nbsp;1.&nbsp;This&nbsp;very&nbsp;big&nbsp;function&nbsp;calls&nbsp;bind&nbsp;again&nbsp;with&nbsp;two<br>
+&nbsp;*&nbsp;arguments.&nbsp;The&nbsp;first&nbsp;is&nbsp;return&nbsp;2&nbsp;and&nbsp;the&nbsp;second&nbsp;is&nbsp;another&nbsp;fairly&nbsp;big<br>
+&nbsp;*&nbsp;function&nbsp;(fun&nbsp;y&nbsp;-&gt;&nbsp;...&nbsp;return&nbsp;())).&nbsp;Again,&nbsp;when&nbsp;(return&nbsp;2)&nbsp;becomes<br>
+&nbsp;*&nbsp;determined,&nbsp;the&nbsp;2&nbsp;is&nbsp;unwrapped&nbsp;and&nbsp;passed&nbsp;into&nbsp;the&nbsp;fairly&nbsp;big&nbsp;function&nbsp;such<br>
+&nbsp;*&nbsp;that&nbsp;y&nbsp;is&nbsp;bound&nbsp;to&nbsp;2.&nbsp;This&nbsp;pattern&nbsp;continues&nbsp;a&nbsp;third&nbsp;time&nbsp;after&nbsp;which&nbsp;z&nbsp;is<br>
+&nbsp;*&nbsp;bound&nbsp;to&nbsp;3.&nbsp;And&nbsp;finally,&nbsp;we&nbsp;run&nbsp;the&nbsp;code&nbsp;which&nbsp;prints&nbsp;the&nbsp;sum&nbsp;of&nbsp;x,&nbsp;y,&nbsp;and&nbsp;z<br>
+&nbsp;*&nbsp;and&nbsp;then&nbsp;return&nbsp;().<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Phew!&nbsp;For&nbsp;summing&nbsp;up&nbsp;three&nbsp;numbers,&nbsp;that's&nbsp;quite&nbsp;a&nbsp;bit&nbsp;of&nbsp;code&nbsp;to&nbsp;think<br>
+&nbsp;*&nbsp;about.&nbsp;Well,&nbsp;while&nbsp;it's&nbsp;nice&nbsp;to&nbsp;know&nbsp;that&nbsp;in&nbsp;reality&nbsp;bind&nbsp;is&nbsp;scheduling<br>
+&nbsp;*&nbsp;functions&nbsp;to&nbsp;run&nbsp;when&nbsp;deferreds&nbsp;become&nbsp;determined,&nbsp;we&nbsp;can&nbsp;alternatively<br>
+&nbsp;*&nbsp;ignore&nbsp;all&nbsp;this&nbsp;and&nbsp;consider&nbsp;a&nbsp;simpler&nbsp;way&nbsp;of&nbsp;thinking&nbsp;about&nbsp;bind&nbsp;and<br>
+&nbsp;*&nbsp;deferreds.&nbsp;Whenever&nbsp;you&nbsp;see&nbsp;code&nbsp;of&nbsp;the&nbsp;form&nbsp;`Deferred.bind&nbsp;d&nbsp;(fun&nbsp;x&nbsp;-&gt;&nbsp;e)`,<br>
+&nbsp;*&nbsp;you&nbsp;can&nbsp;think&nbsp;about&nbsp;the&nbsp;code&nbsp;as&nbsp;the&nbsp;following:&nbsp;`let&nbsp;x&nbsp;=&nbsp;(unwrap&nbsp;d)&nbsp;in&nbsp;e`.<br>
+&nbsp;*&nbsp;That&nbsp;is,&nbsp;whenever&nbsp;you&nbsp;see&nbsp;a&nbsp;deferred&nbsp;being&nbsp;bound&nbsp;to&nbsp;a&nbsp;function,&nbsp;just&nbsp;imagine<br>
+&nbsp;*&nbsp;instead&nbsp;you&nbsp;unwrap&nbsp;the&nbsp;value&nbsp;of&nbsp;the&nbsp;deferred&nbsp;and&nbsp;bind&nbsp;it&nbsp;to&nbsp;argument&nbsp;of<br>
+&nbsp;*&nbsp;function&nbsp;directly&nbsp;using&nbsp;a&nbsp;let&nbsp;expression.&nbsp;If&nbsp;we&nbsp;think&nbsp;of&nbsp;async&nbsp;code&nbsp;like<br>
+&nbsp;*&nbsp;this,&nbsp;then&nbsp;the&nbsp;following&nbsp;function&nbsp;would&nbsp;look&nbsp;something&nbsp;like&nbsp;this:<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;x&nbsp;=&nbsp;1&nbsp;in<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;y&nbsp;=&nbsp;2&nbsp;in<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;z&nbsp;=&nbsp;3&nbsp;in<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;printf&nbsp;"1&nbsp;+&nbsp;2&nbsp;+&nbsp;3&nbsp;=&nbsp;%d\n"&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z);<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;This&nbsp;code&nbsp;is&nbsp;pretty&nbsp;simple.&nbsp;A&nbsp;key&nbsp;to&nbsp;grokking&nbsp;with&nbsp;async&nbsp;code&nbsp;is&nbsp;knowing<br>
+&nbsp;*&nbsp;when&nbsp;to&nbsp;think&nbsp;of&nbsp;binds&nbsp;as&nbsp;scheduling&nbsp;functions&nbsp;to&nbsp;be&nbsp;run&nbsp;deferreds&nbsp;become<br>
+&nbsp;*&nbsp;determined,&nbsp;and&nbsp;when&nbsp;to&nbsp;ignore&nbsp;all&nbsp;that&nbsp;and&nbsp;just&nbsp;think&nbsp;of&nbsp;binds&nbsp;as&nbsp;let<br>
+&nbsp;*&nbsp;expressions.<br>
+&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;sum123&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.bind&nbsp;(return&nbsp;1)&nbsp;(<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.bind&nbsp;(return&nbsp;2)&nbsp;(<span class="keyword">fun</span>&nbsp;y&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.bind&nbsp;(return&nbsp;3)&nbsp;(<span class="keyword">fun</span>&nbsp;z&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"1&nbsp;+&nbsp;2&nbsp;+&nbsp;3&nbsp;=&nbsp;%d\n"</span>&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z);<br>
+&nbsp;&nbsp;return&nbsp;()<br>
+&nbsp;&nbsp;)))<br>
+<br>
+<span class="comment">(*&nbsp;There's&nbsp;also&nbsp;an&nbsp;infix&nbsp;operator&nbsp;&gt;&gt;=&nbsp;that&nbsp;works&nbsp;exactly&nbsp;the&nbsp;same&nbsp;way&nbsp;as<br>
+&nbsp;*&nbsp;Deferred.bind.&nbsp;The&nbsp;following&nbsp;function&nbsp;works&nbsp;exactly&nbsp;the&nbsp;same&nbsp;as&nbsp;the&nbsp;previous<br>
+&nbsp;*&nbsp;one.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;sum456&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;return&nbsp;4&nbsp;&gt;&gt;=&nbsp;(<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;5&nbsp;&gt;&gt;=&nbsp;(<span class="keyword">fun</span>&nbsp;y&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;6&nbsp;&gt;&gt;=&nbsp;(<span class="keyword">fun</span>&nbsp;z&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"4&nbsp;+&nbsp;5&nbsp;+&nbsp;6&nbsp;=&nbsp;%d\n"</span>&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z);<br>
+&nbsp;&nbsp;return&nbsp;())))<br>
+<br>
+<span class="comment">(*&nbsp;The&nbsp;benefit&nbsp;of&nbsp;using&nbsp;&gt;&gt;=&nbsp;over&nbsp;Deferred.bind&nbsp;is&nbsp;that&nbsp;we&nbsp;can&nbsp;remove&nbsp;a&nbsp;lot&nbsp;of<br>
+&nbsp;*&nbsp;the&nbsp;parentheses&nbsp;we&nbsp;needed&nbsp;before!&nbsp;This&nbsp;function&nbsp;does&nbsp;exactly&nbsp;the&nbsp;same&nbsp;thing<br>
+&nbsp;*&nbsp;that&nbsp;the&nbsp;previous&nbsp;two&nbsp;functions&nbsp;did!&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;sum789&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;return&nbsp;7&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;8&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;y&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;9&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;z&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"7&nbsp;+&nbsp;8&nbsp;+&nbsp;9&nbsp;=&nbsp;%d\n"</span>&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z);<br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="comment">(*&nbsp;Recall&nbsp;that&nbsp;the&nbsp;type&nbsp;of&nbsp;bind&nbsp;is&nbsp;'a&nbsp;Deferred.t&nbsp;-&gt;&nbsp;('a&nbsp;-&gt;&nbsp;'b&nbsp;Deferred.t)&nbsp;-&gt;&nbsp;'b<br>
+&nbsp;*&nbsp;Deferred.t.&nbsp;In&nbsp;the&nbsp;previous&nbsp;three&nbsp;functions,&nbsp;'a&nbsp;was&nbsp;instantiated&nbsp;with&nbsp;int,<br>
+&nbsp;*&nbsp;'b&nbsp;was&nbsp;instantiated&nbsp;with&nbsp;unit.&nbsp;Thus,&nbsp;the&nbsp;functions&nbsp;were&nbsp;binding&nbsp;into&nbsp;had&nbsp;to<br>
+&nbsp;*&nbsp;return&nbsp;a&nbsp;unit&nbsp;deferred.&nbsp;This&nbsp;is&nbsp;why&nbsp;we&nbsp;ended&nbsp;the&nbsp;functions&nbsp;with&nbsp;return&nbsp;().<br>
+&nbsp;*&nbsp;We&nbsp;can&nbsp;save&nbsp;some&nbsp;keystrokes&nbsp;by&nbsp;instead&nbsp;using&nbsp;&gt;&gt;|&nbsp;which&nbsp;has&nbsp;the&nbsp;type&nbsp;'a<br>
+&nbsp;*&nbsp;Deferred.t&nbsp;('a&nbsp;-&gt;&nbsp;'b)&nbsp;-&gt;&nbsp;'b&nbsp;Deferred.t.&nbsp;&gt;&gt;|&nbsp;(pronounced&nbsp;map)&nbsp;acts&nbsp;pretty<br>
+&nbsp;*&nbsp;much&nbsp;the&nbsp;same&nbsp;as&nbsp;bind&nbsp;except&nbsp;the&nbsp;function&nbsp;you&nbsp;map&nbsp;into&nbsp;returns&nbsp;a&nbsp;normal&nbsp;'b<br>
+&nbsp;*&nbsp;instead&nbsp;of&nbsp;a&nbsp;'b&nbsp;deferred.&nbsp;You&nbsp;could&nbsp;easily&nbsp;implement&nbsp;&gt;&gt;|&nbsp;using&nbsp;&gt;&gt;=&nbsp;like&nbsp;this:<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;let&nbsp;(&gt;&gt;|)&nbsp;deferred&nbsp;f&nbsp;=<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;deferred&nbsp;&gt;&gt;=&nbsp;(fun&nbsp;x&nbsp;-&gt;&nbsp;return&nbsp;(f&nbsp;x))<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Since&nbsp;printf&nbsp;returns&nbsp;a&nbsp;unit,&nbsp;we&nbsp;can&nbsp;change&nbsp;our&nbsp;last&nbsp;bind&nbsp;to&nbsp;a&nbsp;map&nbsp;and&nbsp;avoid<br>
+&nbsp;*&nbsp;having&nbsp;to&nbsp;return&nbsp;().&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;sum111&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;return&nbsp;1&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;1&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;y&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;1&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;z&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;printf&nbsp;<span class="string">"1&nbsp;+&nbsp;1&nbsp;+&nbsp;1&nbsp;=&nbsp;%d\n"</span>&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z)<br>
+<br>
+<span class="comment">(*&nbsp;However,&nbsp;we&nbsp;can't&nbsp;always&nbsp;swap&nbsp;out&nbsp;&gt;&gt;=&nbsp;for&nbsp;&gt;&gt;|.&nbsp;For&nbsp;example,&nbsp;uncomment&nbsp;the<br>
+&nbsp;*&nbsp;following&nbsp;code&nbsp;and&nbsp;try&nbsp;to&nbsp;build&nbsp;this&nbsp;program.&nbsp;You'll&nbsp;get&nbsp;an&nbsp;error&nbsp;that&nbsp;this<br>
+&nbsp;*&nbsp;function&nbsp;returns&nbsp;something&nbsp;of&nbsp;type&nbsp;unit&nbsp;Deferred.t&nbsp;Deferred.t&nbsp;Deferred.t&nbsp;but<br>
+&nbsp;*&nbsp;was&nbsp;expecting&nbsp;something&nbsp;of&nbsp;type&nbsp;unit&nbsp;Deferred.t!&nbsp;What&nbsp;happened?&nbsp;Well<br>
+&nbsp;*&nbsp;remember&nbsp;that&nbsp;&gt;&gt;|&nbsp;takes&nbsp;in&nbsp;a&nbsp;function&nbsp;from&nbsp;'a&nbsp;to&nbsp;'b,&nbsp;and&nbsp;returns&nbsp;the&nbsp;output<br>
+&nbsp;*&nbsp;to&nbsp;make&nbsp;a&nbsp;'b&nbsp;deferred.&nbsp;printf&nbsp;returns&nbsp;a&nbsp;()&nbsp;and&nbsp;since&nbsp;we&nbsp;have&nbsp;three<br>
+&nbsp;*&nbsp;occurrences&nbsp;of&nbsp;&gt;&gt;|,&nbsp;each&nbsp;one&nbsp;adds&nbsp;a&nbsp;layer&nbsp;of&nbsp;deferred&nbsp;to&nbsp;make&nbsp;a&nbsp;unit<br>
+&nbsp;*&nbsp;Deferred.t&nbsp;Deferred.t&nbsp;Deferred.t!<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;In&nbsp;general,&nbsp;avoid&nbsp;chaining&nbsp;together&nbsp;lambdas&nbsp;with&nbsp;&gt;&gt;|&nbsp;and&nbsp;instead&nbsp;stick&nbsp;with<br>
+&nbsp;*&nbsp;&gt;&gt;=.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;sum222&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="comment">(*<br>
+&nbsp;&nbsp;return&nbsp;2&nbsp;&gt;&gt;|&nbsp;fun&nbsp;x&nbsp;-&gt;<br>
+&nbsp;&nbsp;return&nbsp;2&nbsp;&gt;&gt;|&nbsp;fun&nbsp;y&nbsp;-&gt;<br>
+&nbsp;&nbsp;return&nbsp;2&nbsp;&gt;&gt;|&nbsp;fun&nbsp;z&nbsp;-&gt;<br>
+&nbsp;&nbsp;printf&nbsp;"2&nbsp;+&nbsp;2&nbsp;+&nbsp;2&nbsp;=&nbsp;%d\n"&nbsp;(x&nbsp;+&nbsp;y&nbsp;+&nbsp;z)<br>
+&nbsp;&nbsp;*)</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;sum123&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;sum456&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;sum789&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;sum111&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;sum222&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">"basic&nbsp;async"</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>

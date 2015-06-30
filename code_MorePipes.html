@@ -1,0 +1,210 @@
+<html><head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="HelloWrong" rel="Chapter" href="HelloWrong.html">
+<link title="HelloRight" rel="Chapter" href="HelloRight.html">
+<link title="HelloCommand" rel="Chapter" href="HelloCommand.html">
+<link title="Basics" rel="Chapter" href="Basics.html">
+<link title="Choices" rel="Chapter" href="Choices.html">
+<link title="Pipes" rel="Chapter" href="Pipes.html">
+<link title="Ivars" rel="Chapter" href="Ivars.html">
+<link title="MoreChoices" rel="Chapter" href="MoreChoices.html">
+<link title="MorePipes" rel="Chapter" href="MorePipes.html">
+<link title="StdinLine" rel="Chapter" href="StdinLine.html">
+<link title="StdoutLine" rel="Chapter" href="StdoutLine.html">
+<link title="StdinAll" rel="Chapter" href="StdinAll.html">
+<link title="WriteString" rel="Chapter" href="WriteString.html">
+<link title="WriteLine" rel="Chapter" href="WriteLine.html">
+<link title="WriteWith" rel="Chapter" href="WriteWith.html">
+<link title="Diary" rel="Chapter" href="Diary.html">
+<link title="Cat" rel="Chapter" href="Cat.html">
+<link title="PrintServer" rel="Chapter" href="PrintServer.html">
+<link title="EchoOnceServer" rel="Chapter" href="EchoOnceServer.html">
+<link title="EchoServer" rel="Chapter" href="EchoServer.html">
+<link title="ExitEchoServer" rel="Chapter" href="ExitEchoServer.html">
+<link title="PrintClient" rel="Chapter" href="PrintClient.html">
+<link title="EchoClient" rel="Chapter" href="EchoClient.html">
+<link title="TcpShell" rel="Chapter" href="TcpShell.html">
+<link title="KeyValueStore" rel="Chapter" href="KeyValueStore.html">
+<link title="RedisOp" rel="Chapter" href="RedisOp.html">
+<link title="Redis" rel="Chapter" href="Redis.html">
+<link title="HandCard" rel="Chapter" href="HandCard.html">
+<link title="SexpCard" rel="Chapter" href="SexpCard.html">
+<link title="MarshalCard" rel="Chapter" href="MarshalCard.html">
+<link title="BinioCard" rel="Chapter" href="BinioCard.html">
+<link title="ArithMarshal" rel="Chapter" href="ArithMarshal.html">
+<link title="MarshalClient" rel="Chapter" href="MarshalClient.html">
+<link title="MarshalServer" rel="Chapter" href="MarshalServer.html">
+<link title="ArithSexp" rel="Chapter" href="ArithSexp.html">
+<link title="SexpClient" rel="Chapter" href="SexpClient.html">
+<link title="SexpServer" rel="Chapter" href="SexpServer.html">
+<link title="ToStringProtocol" rel="Chapter" href="ToStringProtocol.html">
+<link title="ToStringClient" rel="Chapter" href="ToStringClient.html">
+<link title="ToStringServer" rel="Chapter" href="ToStringServer.html">
+<link title="ArithRpc" rel="Chapter" href="ArithRpc.html">
+<link title="RpcClient" rel="Chapter" href="RpcClient.html">
+<link title="RpcServer" rel="Chapter" href="RpcServer.html">
+<link title="Ephemeral" rel="Chapter" href="Ephemeral.html">
+<link title="Fsync" rel="Chapter" href="Fsync.html">
+<link title="LevelDb" rel="Chapter" href="LevelDb.html">
+<link title="MoreLevelDb" rel="Chapter" href="MoreLevelDb.html">
+<link title="HelloServer" rel="Chapter" href="HelloServer.html">
+<link title="HelloGetServer" rel="Chapter" href="HelloGetServer.html">
+<link title="HelloHtmlServer" rel="Chapter" href="HelloHtmlServer.html"><title>MorePipes</title>
+</head>
+<body>
+<code class="code"><span class="comment">(*&nbsp;In&nbsp;this&nbsp;program,&nbsp;we'll&nbsp;use&nbsp;pipes&nbsp;in&nbsp;more&nbsp;advanced&nbsp;and&nbsp;more&nbsp;interesting&nbsp;ways.<br>
+&nbsp;*)</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Core</span>.<span class="constructor">Std</span><br>
+<span class="keyword">open</span>&nbsp;<span class="constructor">Async</span>.<span class="constructor">Std</span><br>
+<br>
+<span class="comment">(*&nbsp;Imagine&nbsp;we&nbsp;have&nbsp;two&nbsp;pipes:&nbsp;a&nbsp;and&nbsp;b.&nbsp;Someone&nbsp;is&nbsp;writing&nbsp;colors&nbsp;into&nbsp;pipe&nbsp;a<br>
+&nbsp;*&nbsp;and&nbsp;fruits&nbsp;into&nbsp;pipe&nbsp;b.&nbsp;When&nbsp;we&nbsp;read&nbsp;from&nbsp;pipe&nbsp;a,&nbsp;we&nbsp;get&nbsp;the&nbsp;colors,&nbsp;and<br>
+&nbsp;*&nbsp;when&nbsp;we&nbsp;read&nbsp;from&nbsp;pipe&nbsp;b,&nbsp;we&nbsp;get&nbsp;the&nbsp;fruits.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;a&nbsp;(*&nbsp;blue&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;a&nbsp;(*&nbsp;red&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;b&nbsp;(*&nbsp;bananas&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;b&nbsp;(*&nbsp;strawberries&nbsp;*)<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Now&nbsp;imagine&nbsp;we&nbsp;want&nbsp;to&nbsp;make&nbsp;a&nbsp;single&nbsp;pipe&nbsp;c.&nbsp;Whenever&nbsp;we&nbsp;read&nbsp;from&nbsp;c,&nbsp;we<br>
+&nbsp;*&nbsp;want&nbsp;to&nbsp;get&nbsp;either&nbsp;a&nbsp;color&nbsp;from&nbsp;a&nbsp;or&nbsp;a&nbsp;fruit&nbsp;from&nbsp;b.&nbsp;That's&nbsp;exactly&nbsp;what&nbsp;the<br>
+&nbsp;*&nbsp;interleave&nbsp;function&nbsp;does!&nbsp;It&nbsp;takes&nbsp;in&nbsp;a&nbsp;list&nbsp;of&nbsp;readers&nbsp;and&nbsp;returns&nbsp;a&nbsp;single<br>
+&nbsp;*&nbsp;reader&nbsp;that&nbsp;yields&nbsp;values&nbsp;read&nbsp;from&nbsp;any&nbsp;of&nbsp;the&nbsp;input&nbsp;readers.&nbsp;So&nbsp;if&nbsp;we&nbsp;used<br>
+&nbsp;*&nbsp;interleave&nbsp;to&nbsp;generate&nbsp;c,&nbsp;here's&nbsp;what&nbsp;the&nbsp;reads&nbsp;might&nbsp;look&nbsp;like.<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;let&nbsp;c&nbsp;=&nbsp;interleave&nbsp;[a;&nbsp;b]<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;c&nbsp;(*&nbsp;blue&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;c&nbsp;(*&nbsp;bananas&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;c&nbsp;(*&nbsp;strawberries&nbsp;*)<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;read&nbsp;c&nbsp;(*&nbsp;red&nbsp;*)<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;In&nbsp;terms&nbsp;of&nbsp;implementation,&nbsp;all&nbsp;we&nbsp;do&nbsp;is&nbsp;create&nbsp;a&nbsp;fresh&nbsp;pipe&nbsp;and&nbsp;then<br>
+&nbsp;*&nbsp;transfer&nbsp;the&nbsp;input&nbsp;readers&nbsp;into&nbsp;it.&nbsp;We&nbsp;also&nbsp;have&nbsp;to&nbsp;make&nbsp;sure&nbsp;to&nbsp;close&nbsp;the<br>
+&nbsp;*&nbsp;interleaved&nbsp;pipe&nbsp;when&nbsp;all&nbsp;the&nbsp;input&nbsp;pipes&nbsp;are&nbsp;closed.<br>
+&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;interleave&nbsp;(rs:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Reader</span>.t&nbsp;list)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Reader</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">begin</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Deferred</span>.<span class="constructor">List</span>.iter&nbsp;~how:<span class="keywordsign">`</span><span class="constructor">Parallel</span>&nbsp;rs&nbsp;~f:(<span class="keyword">fun</span>&nbsp;r&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.transfer_id&nbsp;r&nbsp;w)&nbsp;&gt;&gt;&gt;&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Pipe</span>.close&nbsp;w<br>
+&nbsp;&nbsp;<span class="keyword">end</span>;<br>
+&nbsp;&nbsp;r<br>
+<br>
+<span class="comment">(*&nbsp;Here,&nbsp;we&nbsp;show&nbsp;off&nbsp;how&nbsp;to&nbsp;use&nbsp;interleave.&nbsp;We&nbsp;create&nbsp;10&nbsp;pipes&nbsp;and&nbsp;write&nbsp;into<br>
+&nbsp;*&nbsp;each&nbsp;one.&nbsp;Then&nbsp;we&nbsp;interleave&nbsp;the&nbsp;pipes&nbsp;into&nbsp;a&nbsp;single&nbsp;reader&nbsp;and&nbsp;read&nbsp;all&nbsp;the<br>
+&nbsp;*&nbsp;values&nbsp;from&nbsp;it.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_interleave&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(rs,&nbsp;ws)&nbsp;=&nbsp;<span class="constructor">List</span>.(unzip&nbsp;(map&nbsp;(range&nbsp;0&nbsp;10)&nbsp;~f:(<span class="keyword">fun</span>&nbsp;_&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.create&nbsp;())))&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">List</span>.iteri&nbsp;ws&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;w&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;i&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.close&nbsp;w));<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r&nbsp;=&nbsp;interleave&nbsp;rs&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(printf&nbsp;<span class="string">"read&nbsp;%d\n"</span>&nbsp;i))<br>
+<br>
+<span class="comment">(*&nbsp;With&nbsp;interleave,&nbsp;we&nbsp;took&nbsp;a&nbsp;set&nbsp;of&nbsp;pipes&nbsp;and&nbsp;interleaved&nbsp;them&nbsp;into&nbsp;a&nbsp;single<br>
+&nbsp;*&nbsp;pipe.&nbsp;Here,&nbsp;we&nbsp;do&nbsp;the&nbsp;exact&nbsp;opposite.&nbsp;We&nbsp;take&nbsp;a&nbsp;single&nbsp;pipe&nbsp;and&nbsp;replicate<br>
+&nbsp;*&nbsp;its&nbsp;output&nbsp;to&nbsp;a&nbsp;whole&nbsp;set&nbsp;of&nbsp;pipes.&nbsp;We&nbsp;simply&nbsp;iterate&nbsp;over&nbsp;the&nbsp;input&nbsp;pipe<br>
+&nbsp;*&nbsp;and&nbsp;write&nbsp;the&nbsp;contents&nbsp;to&nbsp;every&nbsp;one&nbsp;of&nbsp;the&nbsp;output&nbsp;pipes.&nbsp;We&nbsp;also&nbsp;make&nbsp;sure<br>
+&nbsp;*&nbsp;to&nbsp;close&nbsp;all&nbsp;the&nbsp;output&nbsp;pipes&nbsp;once&nbsp;the&nbsp;input&nbsp;pipe&nbsp;has&nbsp;closed.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;broadcast&nbsp;(r:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Reader</span>.t)&nbsp;(ws:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Writer</span>.t&nbsp;list)&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Deferred</span>.all_unit&nbsp;(<span class="constructor">List</span>.map&nbsp;ws&nbsp;~f:(<span class="keyword">fun</span>&nbsp;w&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;x)))<br>
+&nbsp;&nbsp;&gt;&gt;|&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">List</span>.iter&nbsp;ws&nbsp;~f:<span class="constructor">Pipe</span>.close<br>
+<br>
+<span class="comment">(*&nbsp;Here,&nbsp;we&nbsp;show&nbsp;off&nbsp;how&nbsp;to&nbsp;use&nbsp;broadcast.&nbsp;We&nbsp;create&nbsp;a&nbsp;pipe&nbsp;and&nbsp;write&nbsp;"fee",<br>
+&nbsp;*&nbsp;"fi",&nbsp;"fo",&nbsp;and&nbsp;"fum"&nbsp;into&nbsp;it.&nbsp;Then,&nbsp;we&nbsp;broadcast&nbsp;it&nbsp;into&nbsp;10&nbsp;pipes.&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_broadcast&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(rs,&nbsp;ws)&nbsp;=&nbsp;<span class="constructor">List</span>.(unzip&nbsp;(map&nbsp;(range&nbsp;0&nbsp;10)&nbsp;~f:(<span class="keyword">fun</span>&nbsp;_&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.create&nbsp;())))&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(broadcast&nbsp;r&nbsp;ws);<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;<span class="string">"fee"</span>);<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;<span class="string">"fi"</span>);<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;<span class="string">"fo"</span>);<br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;<span class="string">"fum"</span>);<br>
+&nbsp;&nbsp;<span class="constructor">Pipe</span>.close&nbsp;w;<br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.<span class="constructor">List</span>.iteri&nbsp;~how:<span class="keywordsign">`</span><span class="constructor">Parallel</span>&nbsp;rs&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;r&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;s&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(printf&nbsp;<span class="string">"%d:&nbsp;%s\n"</span>&nbsp;i&nbsp;s)))<br>
+<br>
+<span class="comment">(*&nbsp;Interleave&nbsp;let&nbsp;a&nbsp;bunch&nbsp;of&nbsp;pipes&nbsp;converge&nbsp;into&nbsp;a&nbsp;single&nbsp;pipe.&nbsp;If&nbsp;we&nbsp;imagine<br>
+&nbsp;*&nbsp;data&nbsp;flowing&nbsp;through&nbsp;pipes&nbsp;from&nbsp;left&nbsp;to&nbsp;right,&nbsp;interleave&nbsp;looked&nbsp;like&nbsp;this:<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;__<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;----&gt;----<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;__/<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;And&nbsp;broadcast&nbsp;let&nbsp;a&nbsp;single&nbsp;pipe&nbsp;replicate&nbsp;its&nbsp;output&nbsp;to&nbsp;a&nbsp;whole&nbsp;set&nbsp;of<br>
+&nbsp;*&nbsp;pipes.&nbsp;It&nbsp;looked&nbsp;like&nbsp;this:<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;----&lt;----<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\__<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Now,&nbsp;we'll&nbsp;implement&nbsp;code&nbsp;that&nbsp;let's&nbsp;a&nbsp;whole&nbsp;set&nbsp;of&nbsp;producers&nbsp;(which&nbsp;we'll<br>
+&nbsp;*&nbsp;call&nbsp;publishers)&nbsp;broadcast&nbsp;data&nbsp;to&nbsp;a&nbsp;whole&nbsp;set&nbsp;of&nbsp;consumers&nbsp;(which&nbsp;we'll<br>
+&nbsp;*&nbsp;call&nbsp;subscribers).&nbsp;It&nbsp;looks&nbsp;like&nbsp;this:<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;publisher&nbsp;a&nbsp;&nbsp;__&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__&nbsp;subscriber&nbsp;a<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;publisher&nbsp;b&nbsp;&nbsp;----&gt;----&lt;----&nbsp;subscriber&nbsp;b<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;__/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\__&nbsp;subscriber&nbsp;c<br>
+&nbsp;*&nbsp;&nbsp;&nbsp;publisher&nbsp;c<br>
+&nbsp;*<br>
+&nbsp;*&nbsp;Our&nbsp;publisher/subscriber&nbsp;service&nbsp;will&nbsp;be&nbsp;encapsulate&nbsp;by&nbsp;an&nbsp;instance&nbsp;of&nbsp;type<br>
+&nbsp;*&nbsp;PubSub.t.&nbsp;Any&nbsp;publisher&nbsp;can&nbsp;publish&nbsp;a&nbsp;value&nbsp;by&nbsp;calling&nbsp;pub.&nbsp;For&nbsp;example,&nbsp;if<br>
+&nbsp;*&nbsp;I&nbsp;wanted&nbsp;to&nbsp;publish&nbsp;the&nbsp;string&nbsp;"foo"&nbsp;to&nbsp;a&nbsp;pub/sub&nbsp;instance&nbsp;ps,&nbsp;I&nbsp;would&nbsp;call<br>
+&nbsp;*&nbsp;`PubSub.pub&nbsp;sp&nbsp;"foo"`.&nbsp;Whenever&nbsp;a&nbsp;message&nbsp;is&nbsp;published,&nbsp;it&nbsp;is&nbsp;broadcasted&nbsp;to<br>
+&nbsp;*&nbsp;all&nbsp;the&nbsp;subscribers.&nbsp;In&nbsp;order&nbsp;to&nbsp;become&nbsp;a&nbsp;subscriber,&nbsp;you&nbsp;call&nbsp;`PubSub.sub`.<br>
+&nbsp;*&nbsp;This&nbsp;returns&nbsp;the&nbsp;reader&nbsp;end&nbsp;of&nbsp;a&nbsp;pipe&nbsp;from&nbsp;which&nbsp;you&nbsp;can&nbsp;read&nbsp;published<br>
+&nbsp;*&nbsp;values.&nbsp;There's&nbsp;also&nbsp;a&nbsp;function&nbsp;close&nbsp;which&nbsp;closes&nbsp;all&nbsp;the&nbsp;subscribers'<br>
+&nbsp;*&nbsp;pipes.&nbsp;*)</span><br>
+<span class="keyword">module</span>&nbsp;<span class="constructor">PubSub</span>&nbsp;=&nbsp;<span class="keyword">struct</span><br>
+&nbsp;&nbsp;<span class="keyword">type</span>&nbsp;<span class="keywordsign">'</span>a&nbsp;t&nbsp;=&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Writer</span>.t&nbsp;list&nbsp;ref<br>
+<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;create&nbsp;()&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;ref&nbsp;[]<br>
+<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;pub&nbsp;(subs:&nbsp;<span class="keywordsign">'</span>a&nbsp;t)&nbsp;(x:&nbsp;<span class="keywordsign">'</span>a)&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">Deferred</span>.<span class="constructor">List</span>.iter&nbsp;~how:<span class="keywordsign">`</span><span class="constructor">Parallel</span>&nbsp;!subs&nbsp;~f:(<span class="keyword">fun</span>&nbsp;w&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.write&nbsp;w&nbsp;x)<br>
+<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;sub&nbsp;(subs:&nbsp;<span class="keywordsign">'</span>a&nbsp;t)&nbsp;:&nbsp;<span class="keywordsign">'</span>a&nbsp;<span class="constructor">Pipe</span>.<span class="constructor">Reader</span>.t&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;(r,&nbsp;w)&nbsp;=&nbsp;<span class="constructor">Pipe</span>.create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;subs&nbsp;:=&nbsp;w::!subs;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;r<br>
+<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;close&nbsp;(subs:&nbsp;<span class="keywordsign">'</span>a&nbsp;t)&nbsp;:&nbsp;unit&nbsp;=<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="constructor">List</span>.iter&nbsp;!subs&nbsp;~f:(<span class="constructor">Pipe</span>.close)<br>
+<span class="keyword">end</span><br>
+<br>
+<span class="comment">(*&nbsp;Here's&nbsp;a&nbsp;demo&nbsp;of&nbsp;our&nbsp;pub/sub&nbsp;service!&nbsp;*)</span><br>
+<span class="keyword">let</span>&nbsp;pipe_pub_sub&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;<span class="keyword">open</span>&nbsp;<span class="constructor">PubSub</span>&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;ps&nbsp;=&nbsp;create&nbsp;()&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(pub&nbsp;ps&nbsp;<span class="string">"negative&nbsp;one"</span>);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r0&nbsp;=&nbsp;sub&nbsp;ps&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(pub&nbsp;ps&nbsp;<span class="string">"zero"</span>);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r1&nbsp;=&nbsp;sub&nbsp;ps&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(pub&nbsp;ps&nbsp;<span class="string">"one"</span>);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r2&nbsp;=&nbsp;sub&nbsp;ps&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;don't_wait_for&nbsp;(pub&nbsp;ps&nbsp;<span class="string">"two"</span>);<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;r3&nbsp;=&nbsp;sub&nbsp;ps&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;close&nbsp;ps;<br>
+&nbsp;&nbsp;<span class="keyword">let</span>&nbsp;subs&nbsp;=&nbsp;[r0;&nbsp;r1;&nbsp;r2;&nbsp;r3]&nbsp;<span class="keyword">in</span><br>
+&nbsp;&nbsp;<span class="constructor">Deferred</span>.<span class="constructor">List</span>.iteri&nbsp;subs&nbsp;~f:(<span class="keyword">fun</span>&nbsp;i&nbsp;r&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;<span class="constructor">Pipe</span>.iter&nbsp;r&nbsp;~f:(<span class="keyword">fun</span>&nbsp;x&nbsp;<span class="keywordsign">-&gt;</span>&nbsp;return&nbsp;(printf&nbsp;<span class="string">"%d:&nbsp;%s\n"</span>&nbsp;i&nbsp;x)))<br>
+<br>
+<span class="keyword">let</span>&nbsp;main&nbsp;()&nbsp;:&nbsp;unit&nbsp;<span class="constructor">Deferred</span>.t&nbsp;=<br>
+&nbsp;&nbsp;pipe_interleave&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_broadcast&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;pipe_pub_sub&nbsp;()&nbsp;&gt;&gt;=&nbsp;<span class="keyword">fun</span>&nbsp;()&nbsp;<span class="keywordsign">-&gt;</span><br>
+&nbsp;&nbsp;return&nbsp;()<br>
+<br>
+<span class="keyword">let</span>&nbsp;()&nbsp;=<br>
+&nbsp;&nbsp;<span class="constructor">Command</span>.(run&nbsp;(async&nbsp;~summary:<span class="string">""</span>&nbsp;<span class="constructor">Spec</span>.empty&nbsp;main))<br>
+</code></body></html>
